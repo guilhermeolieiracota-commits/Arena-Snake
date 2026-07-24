@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07111f">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Snake Arena">
+  <meta name="description" content="Snake Arena com perfil público, comunidade online, recuperação de conta, ranking global avançado, nuvem e modo offline.">
+  <title>Snake Arena — Fase 13 Final</title>
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png">
+
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/variables.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <link rel="stylesheet" href="./css/game.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+  <div id="loadingScreen" class="loading-screen" role="status" aria-live="polite">
+    <div class="loading-screen__logo" aria-hidden="true">
+      <span class="loading-screen__snake"></span>
+    </div>
+    <strong>Snake Arena</strong>
+    <p id="loadingMessage">Preparando a arena...</p>
+    <div class="loading-progress" aria-hidden="true">
+      <span></span>
+    </div>
+  </div>
+
+  <main id="app" class="app-shell">
+    <canvas id="gameCanvas" aria-label="Arena do Snake Arena"></canvas>
+
+    <section id="menuScreen" class="screen screen--visible" aria-labelledby="gameTitle">
+      <div class="panel panel--hero">
+        <p class="eyebrow">Comunidade, recuperação e nuvem • Fase 13</p>
+        <h1 id="gameTitle">Snake Arena</h1>
+        <p class="subtitle">
+          Escolha sua aparência, ajuste os controles e dispute uma arena com
+          bots, colisões, ranking, conta opcional, sincronização em nuvem e placar global.
+        </p>
+
+        <div class="form-grid">
+          <label class="field field--wide">
+            <span>Seu apelido</span>
+            <input id="nicknameInput" type="text" maxlength="16" value="Jogador" autocomplete="off">
+          </label>
+
+          <label class="field">
+            <span>Controle mobile</span>
+            <select id="controlModeSelect">
+              <option value="follow">Seguir o toque</option>
+              <option value="joystick">Joystick virtual</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Qualidade gráfica</span>
+            <select id="qualitySelect">
+              <option value="auto">Automática</option>
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+            </select>
+          </label>
+
+          <label class="field field--wide">
+            <span>Dificuldade dos bots</span>
+            <select id="difficultySelect">
+              <option value="calm">Tranquila</option>
+              <option value="normal">Normal</option>
+              <option value="intense">Intensa</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="selected-skin-line">
+          <span>Skin atual</span>
+          <strong id="selectedSkinMenuValue">Menta Neon</strong>
+        </div>
+
+        <div class="menu-wallet">
+          <span>
+            <small>Saldo</small>
+            <strong>🪙 <span id="coinBalanceMenuValue">180</span></strong>
+          </span>
+          <button id="openDailySummaryButton" type="button">
+            <small>Missões de hoje</small>
+            <strong id="dailySummaryValue">0/3</strong>
+          </button>
+        </div>
+
+
+        <button id="openProfileSummaryButton" class="profile-summary-button" type="button">
+          <span class="profile-summary-button__level">
+            <small>Nível</small>
+            <strong id="profileLevelMenuValue">1</strong>
+          </span>
+          <span>
+            <small id="profileTitleMenuValue">Novato da Arena</small>
+            <strong id="profileXpMenuValue">0/105 XP</strong>
+          </span>
+          <span class="profile-summary-button__arrow" aria-hidden="true">›</span>
+        </button>
+
+        <div class="season-menu-summary">
+          <button id="openSeasonSummaryButton" type="button">
+            <small>Temporada</small>
+            <strong id="seasonMenuValue">Nível 1/20</strong>
+          </button>
+          <button id="openWeeklySummaryButton" type="button">
+            <small>Evento semanal</small>
+            <strong id="weeklyMenuValue">0/3</strong>
+          </button>
+        </div>
+
+
+        <button id="openCompetitiveSummaryButton" class="competitive-summary-button" type="button">
+          <span id="competitiveLeagueIconMenu">🥉</span>
+          <span>
+            <small id="competitiveLeagueMenuValue">Bronze</small>
+            <strong><span id="competitiveRatingMenuValue">1000</span> pontos</strong>
+          </span>
+          <span class="competitive-summary-button__streak">
+            🔥 <strong id="streakMenuValue">0</strong>
+          </span>
+        </button>
+
+        <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
+          <span id="onlineSummaryIcon">☁️</span>
+          <span>
+            <small id="onlineSummaryLabel">Modo local</small>
+            <strong id="onlineSummaryValue">Conectar conta</strong>
+          </span>
+          <span id="onlineSummaryState" class="online-summary-button__state">Offline seguro</span>
+        </button>
+
+        <button id="startButton" class="button button--primary" type="button">
+          Entrar na arena
+        </button>
+
+        <div class="menu-tools">
+          <button id="openCompetitiveButton" class="menu-tool-button menu-tool-button--competitive" type="button">
+            <span>🏆</span>
+            Competitivo
+          </button>
+          <button id="openHistoryButton" class="menu-tool-button menu-tool-button--history" type="button">
+            <span>📜</span>
+            Histórico
+          </button>
+          <button id="openDataButton" class="menu-tool-button menu-tool-button--data" type="button">
+            <span>💾</span>
+            Dados
+          </button>
+          <button id="openOnlineButton" class="menu-tool-button menu-tool-button--online" type="button">
+            <span>☁️</span>
+            Online
+          </button>
+          <button id="openProfileButton" class="menu-tool-button menu-tool-button--profile" type="button">
+            <span>👤</span>
+            Perfil
+          </button>
+          <button id="openSeasonButton" class="menu-tool-button menu-tool-button--season" type="button">
+            <span>🌀</span>
+            Temporada
+          </button>
+          <button id="openWeeklyButton" class="menu-tool-button menu-tool-button--weekly" type="button">
+            <span>🎪</span>
+            Evento
+          </button>
+          <button id="openSkinsButton" class="menu-tool-button" type="button">
+            <span>🎨</span>
+            Skins
+          </button>
+          <button id="openDailyButton" class="menu-tool-button menu-tool-button--daily" type="button">
+            <span>📅</span>
+            Missões
+          </button>
+          <button id="openShopButton" class="menu-tool-button menu-tool-button--shop" type="button">
+            <span>🛍️</span>
+            Loja
+          </button>
+          <button id="openStatsButton" class="menu-tool-button" type="button">
+            <span>📊</span>
+            Recordes
+          </button>
+          <button id="openAchievementsButton" class="menu-tool-button" type="button">
+            <span>🏅</span>
+            Conquistas
+          </button>
+          <button id="openSettingsButton" class="menu-tool-button" type="button">
+            <span>⚙️</span>
+            Configurações
+          </button>
+          <button id="menuFullscreenButton" class="menu-tool-button" type="button">
+            <span>⛶</span>
+            Tela cheia
+          </button>
+          <button id="installAppButton" class="menu-tool-button menu-tool-button--accent pwa-install-hidden" type="button">
+            <span>⬇️</span>
+            Instalar app
+          </button>
+        </div>
+
+        <div class="control-tips" aria-label="Controles">
+          <span>🖱️ Mouse direciona</span>
+          <span>⚡ Clique ou Espaço</span>
+          <span>📱 Toque ou joystick</span>
+          <span>🛡️ Proteção ao nascer</span>
+          <span>🏆 Ranking salvo</span>
+        </div>
+
+        <p class="helper">
+          O modo local continua completo. Ao conectar uma conta, você pode enviar
+          o save para a nuvem, restaurar em outro dispositivo e disputar o placar global.
+        </p>
+      </div>
+    </section>
+
+    <section id="pauseScreen" class="screen" aria-labelledby="pauseTitle">
+      <div class="panel panel--small">
+        <p class="eyebrow">Jogo pausado</p>
+        <h2 id="pauseTitle">Pausa</h2>
+        <p class="subtitle">
+          Toda a arena, colisões, IA, efeitos e respawns estão congelados.
+        </p>
+
+        <button id="resumeButton" class="button button--primary" type="button">
+          Continuar
+        </button>
+        <button id="pauseSettingsButton" class="button button--secondary" type="button">
+          Configurações
+        </button>
+        <button id="restartButton" class="button button--secondary" type="button">
+          Reiniciar partida
+        </button>
+        <button id="menuButton" class="button button--secondary" type="button">
+          Voltar ao menu
+        </button>
+      </div>
+    </section>
+
+    <section id="settingsScreen" class="screen" aria-labelledby="settingsTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Preferências salvas</p>
+        <h2 id="settingsTitle">Configurações</h2>
+        <p class="subtitle">
+          Os ajustes são aplicados ao jogo atual e permanecem salvos.
+        </p>
+
+        <div class="settings-grid">
+          <label class="field">
+            <span>Apelido</span>
+            <input id="settingsNicknameInput" type="text" maxlength="16" autocomplete="off">
+          </label>
+
+          <label class="field">
+            <span>Controle mobile</span>
+            <select id="settingsControlModeSelect">
+              <option value="follow">Seguir o toque</option>
+              <option value="joystick">Joystick virtual</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Qualidade gráfica</span>
+            <select id="settingsQualitySelect">
+              <option value="auto">Automática</option>
+              <option value="low">Baixa</option>
+              <option value="medium">Média</option>
+              <option value="high">Alta</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Dificuldade</span>
+            <select id="settingsDifficultySelect">
+              <option value="calm">Tranquila</option>
+              <option value="normal">Normal</option>
+              <option value="intense">Intensa</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="settingsSkinButton" class="skin-setting-button" type="button">
+          <span>
+            <small>Skin selecionada</small>
+            <strong id="settingsSkinValue">Menta Neon</strong>
+          </span>
+          <span aria-hidden="true">›</span>
+        </button>
+
+        <div class="settings-section">
+          <h3>Áudio</h3>
+
+          <label class="range-field">
+            <span>Volume geral <output id="masterVolumeOutput">82%</output></span>
+            <input id="masterVolumeInput" type="range" min="0" max="100" step="1" value="82">
+          </label>
+
+          <label class="range-field">
+            <span>Efeitos <output id="sfxVolumeOutput">88%</output></span>
+            <input id="sfxVolumeInput" type="range" min="0" max="100" step="1" value="88">
+          </label>
+
+          <label class="range-field">
+            <span>Música <output id="musicVolumeOutput">34%</output></span>
+            <input id="musicVolumeInput" type="range" min="0" max="100" step="1" value="34">
+          </label>
+        </div>
+
+        <div class="toggle-grid">
+          <label class="toggle-field">
+            <input id="mutedInput" type="checkbox">
+            <span>Silenciar tudo</span>
+          </label>
+
+          <label class="toggle-field">
+            <input id="showLeaderboardInput" type="checkbox" checked>
+            <span>Mostrar ranking</span>
+          </label>
+
+          <label class="toggle-field">
+            <input id="showMinimapInput" type="checkbox" checked>
+            <span>Mostrar minimapa</span>
+          </label>
+
+          <label class="toggle-field">
+            <input id="showSnakeNamesInput" type="checkbox" checked>
+            <span>Mostrar nomes</span>
+          </label>
+
+          <label class="toggle-field">
+            <input id="reducedEffectsInput" type="checkbox">
+            <span>Reduzir efeitos</span>
+          </label>
+        </div>
+
+        <div class="panel-actions">
+          <button id="settingsSaveButton" class="button button--primary" type="button">
+            Salvar configurações
+          </button>
+          <button id="settingsResetButton" class="button button--secondary" type="button">
+            Restaurar padrão
+          </button>
+          <button id="settingsBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="skinsScreen" class="screen" aria-labelledby="skinsTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Personalização visual</p>
+        <h2 id="skinsTitle">Escolha sua skin</h2>
+        <p class="subtitle">
+          Aqui aparecem as skins já desbloqueadas. Novas aparências podem ser compradas na loja.
+        </p>
+
+        <div id="skinPreview" class="skin-preview">
+          <div id="skinPreviewSnake" class="skin-preview__snake"></div>
+          <div>
+            <strong id="skinPreviewName">Menta Neon</strong>
+            <p id="skinPreviewDescription">A identidade clássica do Snake Arena.</p>
+          </div>
+        </div>
+
+        <div id="skinGrid" class="skin-grid" aria-label="Lista de skins"></div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="skinApplyButton" class="button button--primary" type="button">
+            Aplicar skin
+          </button>
+          <button id="skinBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+
+
+
+    <section id="onlineScreen" class="screen" aria-labelledby="onlineTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Conta, comunidade e proteção da nuvem</p>
+        <h2 id="onlineTitle">Modo online</h2>
+
+        <div class="online-status-grid">
+          <div>
+            <span>Configuração</span>
+            <strong id="onlineConfigurationState">Não configurado</strong>
+          </div>
+          <div>
+            <span>Rede</span>
+            <strong id="onlineNetworkState">Verificando...</strong>
+          </div>
+          <div>
+            <span>Sincronização</span>
+            <strong id="onlineSyncState">Modo local</strong>
+          </div>
+        </div>
+
+        <div id="onlineSetupPanel" class="online-setup-panel">
+          <h3>Ative a conexão Supabase</h3>
+          <p>
+            O jogo continua funcionando normalmente sem configuração. Para ativar contas,
+            nuvem e placar global, execute o SQL incluído e preencha o arquivo
+            <code>js/config/cloud-config.js</code>.
+          </p>
+          <div class="online-setup-steps">
+            <span>1. Execute <strong>supabase/snake-arena-phase12.sql e depois snake-arena-phase13-upgrade.sql</strong></span>
+            <span>2. Adicione a URL e a chave pública</span>
+            <span>3. Defina <strong>enabled: true</strong></span>
+          </div>
+        </div>
+
+        <div id="onlineAuthPanel" class="online-auth-panel" hidden>
+          <h3>Entrar ou criar conta</h3>
+          <div class="form-grid">
+            <label class="field field--wide">
+              <span>E-mail</span>
+              <input id="onlineEmailInput" type="email" autocomplete="email" placeholder="seu@email.com">
+            </label>
+            <label class="field field--wide">
+              <span>Senha</span>
+              <input id="onlinePasswordInput" type="password" minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres">
+            </label>
+          </div>
+          <div class="panel-actions panel-actions--horizontal">
+            <button id="onlineSignInButton" class="button button--primary" type="button">Entrar</button>
+            <button id="onlineSignUpButton" class="button button--secondary" type="button">Criar conta</button>
+          </div>
+          <div class="online-auth-links">
+            <button id="onlineForgotPasswordButton" type="button">Esqueci minha senha</button>
+            <button id="onlineResendConfirmationButton" type="button">Reenviar confirmação</button>
+          </div>
+          <p id="onlineAuthMessage" class="online-message"></p>
+        </div>
+
+        <div id="onlineRecoveryPanel" class="online-recovery-panel" hidden>
+          <h3>Definir nova senha</h3>
+          <p>
+            Esta tela aparece depois que você abre o link de recuperação enviado pelo Supabase.
+          </p>
+          <div class="form-grid">
+            <label class="field field--wide">
+              <span>Nova senha</span>
+              <input id="onlineNewPasswordInput" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo de 6 caracteres">
+            </label>
+            <label class="field field--wide">
+              <span>Confirmar nova senha</span>
+              <input id="onlineConfirmPasswordInput" type="password" minlength="6" autocomplete="new-password" placeholder="Repita a nova senha">
+            </label>
+          </div>
+          <div class="panel-actions panel-actions--horizontal">
+            <button id="onlineUpdatePasswordButton" class="button button--primary" type="button">Atualizar senha</button>
+            <button id="onlineRecoveryCancelButton" class="button button--secondary" type="button">Cancelar</button>
+          </div>
+          <p id="onlineRecoveryMessage" class="online-message"></p>
+        </div>
+
+        <div id="onlineAccountPanel" class="online-account-panel" hidden>
+          <div class="online-account-header">
+            <span>
+              <small>Conta conectada</small>
+              <strong id="onlineAccountEmailValue">—</strong>
+            </span>
+            <button id="onlineSignOutButton" type="button">Sair deste aparelho</button>
+          </div>
+
+          <label class="online-auto-sync">
+            <input id="onlineAutoSyncInput" type="checkbox" checked>
+            <span>Enviar automaticamente após cada partida</span>
+          </label>
+
+          <div class="online-sync-grid">
+            <div><span>Último envio</span><strong id="onlineLastPushValue">Nunca</strong></div>
+            <div><span>Último download</span><strong id="onlineLastPullValue">Nunca</strong></div>
+          </div>
+
+          <div class="data-actions-grid">
+            <button id="onlineUploadButton" class="button button--primary" type="button">Enviar este dispositivo</button>
+            <button id="onlineDownloadButton" class="button button--danger" type="button">Baixar e substituir</button>
+            <button id="onlineChangePasswordButton" class="button button--secondary" type="button">Alterar senha</button>
+          </div>
+
+          <p class="data-warning">
+            “Baixar e substituir” troca o progresso local pelo save da nuvem e sempre pede confirmação.
+          </p>
+
+          <div class="online-public-profile-card">
+            <div class="online-public-profile-card__heading">
+              <span>
+                <small>Comunidade</small>
+                <strong>Perfil público</strong>
+              </span>
+              <label class="online-switch">
+                <input id="onlinePublicProfileInput" type="checkbox" checked>
+                <span>Visível</span>
+              </label>
+            </div>
+
+            <label class="field field--wide">
+              <span>Frase do perfil</span>
+              <input id="onlineTaglineInput" type="text" maxlength="80" placeholder="Ex.: Buscando o topo da arena">
+            </label>
+
+            <div class="online-sync-grid">
+              <div><span>Último perfil</span><strong id="onlineLastProfilePushValue">Nunca</strong></div>
+              <div><span>Últimas partidas</span><strong id="onlineLastMatchesPushValue">Nunca</strong></div>
+            </div>
+
+            <div class="data-actions-grid">
+              <button id="onlineSavePublicProfileButton" class="button button--primary" type="button">Salvar perfil público</button>
+              <button id="onlineSyncCommunityButton" class="button button--secondary" type="button">Enviar perfil e partidas</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="onlineLeaderboardPanel" class="online-leaderboard-panel" hidden>
+          <div class="online-leaderboard-heading">
+            <span>
+              <small>Atualização</small>
+              <strong id="onlineLeaderboardUpdatedValue">Nunca</strong>
+            </span>
+            <button id="onlineRefreshLeaderboardButton" type="button">Atualizar tudo</button>
+          </div>
+
+          <div class="online-leaderboard-filters">
+            <label class="field">
+              <span>Buscar jogador</span>
+              <input id="onlineLeaderboardSearchInput" type="search" placeholder="Apelido ou ID">
+            </label>
+            <label class="field">
+              <span>Liga</span>
+              <select id="onlineLeaderboardLeagueSelect">
+                <option value="all">Todas</option>
+                <option value="bronze">Bronze</option>
+                <option value="silver">Prata</option>
+                <option value="gold">Ouro</option>
+                <option value="platinum">Platina</option>
+                <option value="diamond">Diamante</option>
+                <option value="master">Mestre</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Ordenar</span>
+              <select id="onlineLeaderboardSortSelect">
+                <option value="rating">Rating</option>
+                <option value="score">Melhor pontuação</option>
+                <option value="wins">Vitórias</option>
+                <option value="level">Nível</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="online-leaderboard-result-line">
+            <span>Jogadores exibidos</span>
+            <strong id="onlineLeaderboardCountValue">0</strong>
+          </div>
+
+          <div id="globalLeaderboardList" class="global-leaderboard-list"></div>
+        </div>
+
+        <div id="communityProfilePanel" class="community-profile-panel" hidden>
+          <div class="community-profile-heading">
+            <div id="communityProfileAvatar" class="community-profile-avatar"></div>
+            <div>
+              <small id="communityProfileId">—</small>
+              <h3 id="communityProfileName">Jogador</h3>
+              <p id="communityProfileTagline">Perfil da comunidade</p>
+            </div>
+            <button id="communityProfileCloseButton" type="button" aria-label="Fechar perfil">×</button>
+          </div>
+
+          <div class="community-profile-badges">
+            <span id="communityProfileLeague">🥉 Bronze</span>
+            <span id="communityProfileTitle">Novato da Arena</span>
+          </div>
+
+          <div class="community-profile-stats">
+            <div><span>Nível</span><strong id="communityProfileLevel">1</strong></div>
+            <div><span>Partidas</span><strong id="communityProfileGames">0</strong></div>
+            <div><span>Eliminações</span><strong id="communityProfileEliminations">0</strong></div>
+            <div><span>Melhor score</span><strong id="communityProfileBestScore">0</strong></div>
+            <div><span>Vitórias</span><strong id="communityProfileWins">0</strong></div>
+            <div><span>Sequência</span><strong>🔥 <span id="communityProfileStreak">0</span></strong></div>
+          </div>
+
+          <div class="community-profile-update">
+            Atualizado em <strong id="communityProfileUpdated">—</strong>
+          </div>
+
+          <h4>Partidas públicas recentes</h4>
+          <div id="communityProfileMatches" class="community-profile-matches"></div>
+        </div>
+
+        <div class="online-community-panel">
+          <div class="online-leaderboard-heading">
+            <span>
+              <small>Comunidade ao vivo</small>
+              <strong id="onlineGlobalFeedUpdatedValue">Nunca</strong>
+            </span>
+            <button id="onlineRefreshCommunityButton" type="button">Atualizar comunidade</button>
+          </div>
+          <div id="globalFeedList" class="global-feed-list"></div>
+        </div>
+
+        <div class="online-diagnostics-panel">
+          <div class="online-leaderboard-heading">
+            <span>
+              <small>Diagnóstico da nuvem</small>
+              <strong id="onlineDiagnosticsUpdatedValue">Ainda não executado</strong>
+            </span>
+            <button id="onlineRunDiagnosticsButton" type="button">Executar diagnóstico</button>
+          </div>
+          <div id="cloudDiagnosticsList" class="cloud-diagnostics-list"></div>
+        </div>
+
+        <button id="onlineBackButton" class="button button--secondary" type="button">Voltar</button>
+      </div>
+    </section>
+
+    <section id="competitiveScreen" class="screen" aria-labelledby="competitiveTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Progressão competitiva local</p>
+        <h2 id="competitiveTitle">Liga e ranking pessoal</h2>
+
+        <div class="competitive-hero">
+          <span id="competitiveLeagueIcon" class="competitive-league-icon">🥉</span>
+          <div>
+            <small>Liga atual</small>
+            <strong id="competitiveLeagueName">Bronze</strong>
+            <span><strong id="competitiveRatingValue">1000</strong> pontos de rating</span>
+          </div>
+          <div class="competitive-peak">
+            <small>Recorde</small>
+            <strong id="competitivePeakValue">1000</strong>
+          </div>
+        </div>
+
+        <div class="competitive-progress">
+          <div>
+            <span>Progresso da liga</span>
+            <strong id="competitiveProgressValue">0/150 para Prata</strong>
+          </div>
+          <div class="competitive-progress__bar">
+            <span id="competitiveProgressFill"></span>
+          </div>
+        </div>
+
+        <div class="competitive-stats-grid">
+          <div><span>Partidas</span><strong id="competitiveMatchesValue">0</strong></div>
+          <div><span>Vitórias</span><strong id="competitiveWinsValue">0</strong></div>
+          <div><span>Top 3</span><strong id="competitiveTop3Value">0</strong></div>
+          <div><span>Posição média</span><strong id="competitiveAverageRankValue">—</strong></div>
+        </div>
+
+        <div class="competitive-ranking-local">
+          <h3>Melhores partidas locais</h3>
+          <ol id="competitiveBestRunsList"></ol>
+        </div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="competitiveHistoryButton" class="button button--primary" type="button">
+            Ver histórico completo
+          </button>
+          <button id="competitiveBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="historyScreen" class="screen" aria-labelledby="historyTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Últimas 50 partidas</p>
+        <h2 id="historyTitle">Histórico de partidas</h2>
+
+        <div class="history-summary">
+          <span>Partidas armazenadas</span>
+          <strong id="historyCountValue">0/50</strong>
+        </div>
+
+        <div id="matchHistoryList" class="match-history-list"></div>
+
+        <div class="panel-actions">
+          <button id="historyCompetitiveButton" class="button button--primary" type="button">
+            Ver liga competitiva
+          </button>
+          <button id="historyClearButton" class="button button--danger" type="button">
+            Limpar histórico
+          </button>
+          <button id="historyBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="dataScreen" class="screen" aria-labelledby="dataTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Segurança do progresso local</p>
+        <h2 id="dataTitle">Backup e dados</h2>
+        <p class="subtitle">
+          Exporte o progresso para um arquivo e restaure em outro navegador ou dispositivo.
+        </p>
+
+        <div class="data-summary-grid">
+          <div><span>ID do jogador</span><strong id="dataPlayerIdValue">SA-000000000000</strong></div>
+          <div><span>Versão do save</span><strong id="dataSaveVersionValue">5</strong></div>
+          <div><span>Tamanho estimado</span><strong id="dataBackupSizeValue">0 KB</strong></div>
+          <div><span>Partidas salvas</span><strong id="dataMatchesValue">0</strong></div>
+        </div>
+
+        <div class="data-backup-card">
+          <span>Último backup</span>
+          <strong id="dataLastBackupValue">Nunca</strong>
+        </div>
+
+        <div class="data-actions-grid">
+          <button id="dataExportButton" class="button button--primary" type="button">
+            Exportar backup
+          </button>
+          <button id="dataImportButton" class="button button--secondary" type="button">
+            Importar backup
+          </button>
+          <button id="dataCopyIdButton" class="button button--secondary" type="button">
+            Copiar ID
+          </button>
+          <button id="dataResetAllButton" class="button button--danger" type="button">
+            Apagar todo o progresso
+          </button>
+        </div>
+
+        <input id="dataImportInput" type="file" accept="application/json,.json" hidden>
+
+        <p class="data-warning">
+          Importar substitui o progresso atual. Faça um backup antes de apagar ou restaurar dados.
+        </p>
+
+        <button id="dataBackButton" class="button button--secondary" type="button">
+          Voltar
+        </button>
+      </div>
+    </section>
+
+    <section id="profileScreen" class="screen" aria-labelledby="profileTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Identidade e progressão</p>
+        <h2 id="profileTitle">Perfil do jogador</h2>
+
+        <div class="profile-hero">
+          <div id="profileSkinPreview" class="profile-skin-preview"></div>
+          <div class="profile-hero__content">
+            <span class="profile-level-badge">Nível <strong id="profileLevelValue">1</strong></span>
+            <h3 id="profileNicknameValue">Jogador</h3>
+            <p id="profileTitleValue">Novato da Arena</p>
+
+            <div class="profile-xp">
+              <div>
+                <span>Experiência</span>
+                <strong id="profileXpValue">0/105 XP</strong>
+              </div>
+              <div class="profile-xp__bar">
+                <span id="profileXpFill"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <label class="field profile-title-field">
+          <span>Título exibido</span>
+          <select id="profileTitleSelect"></select>
+        </label>
+
+        <div class="profile-identity-line">
+          <span>ID local: <strong id="profilePlayerIdValue">SA-000000000000</strong></span>
+          <span>Sequência: 🔥 <strong id="profileStreakValue">0</strong> dias</span>
+        </div>
+
+        <div class="profile-stats-grid">
+          <div><span>Moedas</span><strong>🪙 <span id="profileCoinsValue">180</span></strong></div>
+          <div><span>Partidas</span><strong id="profileGamesValue">0</strong></div>
+          <div><span>Melhor score</span><strong id="profileBestScoreValue">0</strong></div>
+          <div><span>Eliminações</span><strong id="profileEliminationsValue">0</strong></div>
+        </div>
+
+        <div class="profile-history">
+          <h3>XP recente</h3>
+          <ul id="profileHistoryList"></ul>
+        </div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="profileSeasonButton" class="button button--primary" type="button">
+            Ver temporada
+          </button>
+          <button id="profileBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="seasonScreen" class="screen" aria-labelledby="seasonTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Progressão de 28 dias</p>
+        <h2 id="seasonTitle">Temporada atual</h2>
+
+        <div id="seasonTrack" class="season-track">
+          <div>
+            <small id="seasonDaysValue">28 dias</small>
+            <strong id="seasonNameValue">⚡ Ascensão Neon</strong>
+          </div>
+          <span class="season-level-orb">Nível <strong id="seasonLevelValue">1/20</strong></span>
+        </div>
+
+        <div class="season-progress">
+          <div>
+            <span>Progresso para o próximo nível</span>
+            <strong id="seasonPointsValue">0/260</strong>
+          </div>
+          <div class="season-progress__bar">
+            <span id="seasonProgressFill"></span>
+          </div>
+        </div>
+
+        <div id="seasonRewardsGrid" class="season-rewards-grid"></div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="seasonWeeklyButton" class="button button--primary" type="button">
+            Ver evento semanal
+          </button>
+          <button id="seasonBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="weeklyScreen" class="screen" aria-labelledby="weeklyTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Progresso acumulado entre partidas</p>
+        <h2 id="weeklyTitle">Evento semanal</h2>
+
+        <div class="weekly-event-header">
+          <div>
+            <small id="weeklyDaysValue">7 dias restantes</small>
+            <strong id="weeklyEventNameValue">✨ Festival da Energia</strong>
+            <p id="weeklyEventDescription">Complete os objetivos semanais.</p>
+          </div>
+          <span><strong id="weeklyCompletedValue">0/3</strong> objetivos</span>
+        </div>
+
+        <div id="weeklyObjectivesGrid" class="weekly-objectives-grid"></div>
+
+        <div id="weeklyBonusCard" class="weekly-bonus-card">
+          <span>Recompensa por completar tudo</span>
+          <strong id="weeklyBonusValue">🪙 320 • ⭐ 280 XP • 🌀 220 pontos • 🏷️ Título</strong>
+          <small id="weeklyBonusStatus">Complete os três objetivos</small>
+        </div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="weeklySeasonButton" class="button button--primary" type="button">
+            Ver temporada
+          </button>
+          <button id="weeklyBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="dailyScreen" class="screen" aria-labelledby="dailyTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Objetivos renovados diariamente</p>
+        <h2 id="dailyTitle">Missões do dia</h2>
+        <p class="subtitle">
+          Complete as três missões para receber moedas. O progresso é salvo automaticamente.
+        </p>
+
+        <div class="daily-header">
+          <span>
+            <small>Data local</small>
+            <strong id="dailyDateValue">—</strong>
+          </span>
+          <span>
+            <small>Concluídas</small>
+            <strong id="dailyCompletedValue">0/3</strong>
+          </span>
+          <span>
+            <small>Saldo</small>
+            <strong>🪙 <span id="dailyCoinBalanceValue">180</span></strong>
+          </span>
+        </div>
+
+        <div id="dailyChallengesGrid" class="daily-grid"></div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="dailyShopButton" class="button button--primary" type="button">
+            Abrir loja
+          </button>
+          <button id="dailyBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="shopScreen" class="screen" aria-labelledby="shopTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Economia local sem dinheiro real</p>
+        <h2 id="shopTitle">Loja de skins</h2>
+        <p class="subtitle">
+          Use somente as moedas conquistadas nas partidas, missões e conquistas.
+        </p>
+
+        <div class="shop-wallet">
+          <span>
+            <small>Seu saldo</small>
+            <strong>🪙 <span id="shopCoinBalanceValue">180</span></strong>
+          </span>
+          <span>
+            <small>Skins desbloqueadas</small>
+            <strong id="ownedSkinsValue">2/8</strong>
+          </span>
+        </div>
+
+        <div id="shopGrid" class="shop-grid"></div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="shopDailyButton" class="button button--primary" type="button">
+            Ver missões
+          </button>
+          <button id="shopBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="statsScreen" class="screen" aria-labelledby="statsTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Progresso local</p>
+        <h2 id="statsTitle">Seus recordes</h2>
+        <p class="subtitle">
+          Estes dados ficam salvos apenas neste navegador e neste dispositivo.
+        </p>
+
+        <div id="statsGrid" class="stats-grid"></div>
+
+        <p id="lastPlayedValue" class="last-played">
+          Nenhuma partida concluída ainda.
+        </p>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="statsResetButton" class="button button--danger" type="button">
+            Zerar recordes
+          </button>
+          <button id="statsBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="achievementsScreen" class="screen" aria-labelledby="achievementsTitle">
+      <div class="panel panel--wide">
+        <p class="eyebrow">Desafios permanentes</p>
+        <h2 id="achievementsTitle">Conquistas</h2>
+        <p class="subtitle">
+          Complete objetivos durante as partidas. O progresso fica salvo neste navegador.
+        </p>
+
+        <div class="achievement-summary">
+          <span>Progresso geral</span>
+          <strong id="achievementCountValue">0/13</strong>
+        </div>
+
+        <div id="achievementsGrid" class="achievements-grid"></div>
+
+        <div class="panel-actions panel-actions--horizontal">
+          <button id="achievementsResetButton" class="button button--danger" type="button">
+            Zerar conquistas
+          </button>
+          <button id="achievementsBackButton" class="button button--secondary" type="button">
+            Voltar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="gameOverScreen" class="screen" aria-labelledby="gameOverTitle">
+      <div class="panel game-over-panel">
+        <p class="eyebrow">Fim de partida</p>
+        <h2 id="gameOverTitle">Você foi eliminado</h2>
+        <p id="gameOverReason" class="subtitle">Sua cobra colidiu.</p>
+
+        <div class="result-grid">
+          <div class="result-card">
+            <span>Pontuação</span>
+            <strong id="finalScoreValue">0</strong>
+          </div>
+          <div class="result-card">
+            <span>Maior massa</span>
+            <strong id="finalMassValue">120</strong>
+          </div>
+          <div class="result-card">
+            <span>Eliminações</span>
+            <strong id="finalEliminationsValue">0</strong>
+          </div>
+          <div class="result-card">
+            <span>Posição</span>
+            <strong id="finalRankValue">—</strong>
+          </div>
+          <div class="result-card">
+            <span>Tempo</span>
+            <strong id="finalTimeValue">0:00</strong>
+          </div>
+          <div class="result-card">
+            <span>Coletadas</span>
+            <strong id="finalCollectedValue">0</strong>
+          </div>
+          <div class="result-card result-card--coins">
+            <span>Moedas ganhas</span>
+            <strong>🪙 <span id="finalCoinsEarnedValue">0</span></strong>
+          </div>
+          <div class="result-card result-card--xp">
+            <span>XP recebido</span>
+            <strong>⭐ <span id="finalXpEarnedValue">0</span></strong>
+          </div>
+          <div class="result-card result-card--season">
+            <span>Pontos da temporada</span>
+            <strong>🌀 <span id="finalSeasonEarnedValue">0</span></strong>
+          </div>
+          <div class="result-card result-card--rating">
+            <span>Rating</span>
+            <strong id="finalRatingDeltaValue">+0</strong>
+          </div>
+          <div class="result-card result-card--medal">
+            <span>Desempenho</span>
+            <strong id="finalMedalValue">🎮 Competidor</strong>
+          </div>
+        </div>
+
+        <button id="gameOverRestartButton" class="button button--primary" type="button">
+          Jogar novamente
+        </button>
+        <button id="gameOverShareButton" class="button button--primary" type="button">
+          Compartilhar resultado
+        </button>
+        <button id="gameOverCompetitiveButton" class="button button--secondary" type="button">
+          Ver liga
+        </button>
+        <button id="gameOverHistoryButton" class="button button--secondary" type="button">
+          Ver histórico
+        </button>
+        <button id="gameOverProfileButton" class="button button--secondary" type="button">
+          Ver perfil
+        </button>
+        <button id="gameOverSeasonButton" class="button button--secondary" type="button">
+          Ver temporada
+        </button>
+        <button id="gameOverDailyButton" class="button button--secondary" type="button">
+          Ver missões
+        </button>
+        <button id="gameOverShopButton" class="button button--secondary" type="button">
+          Abrir loja
+        </button>
+        <button id="gameOverStatsButton" class="button button--secondary" type="button">
+          Ver recordes
+        </button>
+        <button id="gameOverAchievementsButton" class="button button--secondary" type="button">
+          Ver conquistas
+        </button>
+        <button id="gameOverMenuButton" class="button button--secondary" type="button">
+          Voltar ao menu
+        </button>
+      </div>
+    </section>
+
+    <section id="gameHud" class="game-hud" aria-live="polite" aria-hidden="true">
+      <div class="hud-card hud-card--player">
+        <span class="hud-label">Jogador</span>
+        <strong id="playerNameValue">Jogador</strong>
+      </div>
+
+      <div class="hud-card hud-card--score">
+        <span class="hud-label">Pontuação</span>
+        <strong id="scoreValue">0</strong>
+      </div>
+
+      <div class="hud-card">
+        <span class="hud-label">Massa</span>
+        <strong id="massValue">120</strong>
+      </div>
+
+      <div class="hud-card hud-card--rank">
+        <span class="hud-label">Posição</span>
+        <strong id="rankValue">—</strong>
+      </div>
+
+      <div class="hud-card hud-card--kills">
+        <span class="hud-label">Eliminações</span>
+        <strong id="eliminationsValue">0</strong>
+      </div>
+
+      <div class="hud-card hud-card--coins">
+        <span class="hud-label">Moedas</span>
+        <strong>🪙 <span id="coinBalanceHudValue">180</span></strong>
+      </div>
+
+      <div class="hud-card hud-card--level">
+        <span class="hud-label" id="profileTitleHudValue">Novato</span>
+        <strong>Nv. <span id="profileLevelHudValue">1</span></strong>
+      </div>
+
+      <div class="hud-card hud-card--league">
+        <span class="hud-label" id="leagueHudNameValue">Bronze</span>
+        <strong><span id="ratingHudValue">1000</span> RP</strong>
+      </div>
+
+      <div id="protectionCard" class="hud-card hud-card--protection">
+        <span class="hud-label">Proteção</span>
+        <strong id="protectionValue">2.6s</strong>
+      </div>
+
+      <div id="boostCard" class="hud-card hud-card--boost">
+        <div class="hud-row">
+          <span class="hud-label">Turbo</span>
+          <strong id="boostValue">Pronto</strong>
+        </div>
+        <div class="boost-meter" aria-hidden="true">
+          <div id="boostFill" class="boost-meter__fill"></div>
+        </div>
+      </div>
+
+      <button id="audioToggleButton" class="icon-button" type="button" aria-label="Ativar ou desativar áudio">
+        🔊
+      </button>
+      <button id="settingsHudButton" class="icon-button" type="button" aria-label="Abrir configurações">
+        ⚙
+      </button>
+      <button id="fullscreenHudButton" class="icon-button icon-button--optional" type="button" aria-label="Alternar tela cheia">
+        ⛶
+      </button>
+      <button id="pauseButton" class="icon-button" type="button" aria-label="Pausar jogo">
+        Ⅱ
+      </button>
+    </section>
+
+    <aside id="leaderboard" class="leaderboard" aria-label="Ranking da arena">
+      <div class="leaderboard__title">
+        <span>🏆 Ranking</span>
+        <small id="rankingTotalValue">0 cobras</small>
+      </div>
+      <ol id="leaderboardList" class="leaderboard__list"></ol>
+    </aside>
+
+    <aside id="minimap" class="minimap" aria-label="Minimapa da arena">
+      <div class="minimap__title">Radar</div>
+      <canvas id="minimapCanvas"></canvas>
+    </aside>
+
+    <div id="killFeed" class="kill-feed" aria-live="polite"></div>
+
+    <div id="centerHint" class="center-hint" aria-hidden="true">
+      Você está protegido por alguns segundos
+    </div>
+
+    <div id="joystick" class="joystick" aria-hidden="true">
+      <div id="joystickKnob" class="joystick__knob"></div>
+    </div>
+
+    <button id="boostButton" class="boost-button" type="button" aria-label="Ativar turbo" aria-hidden="true">
+      <span aria-hidden="true">⚡</span>
+      <small>Turbo</small>
+    </button>
+
+
+    <div id="networkBanner" class="status-banner status-banner--offline" hidden>
+      <span>📴 Você está offline. O jogo continua disponível.</span>
+    </div>
+
+    <div id="installBanner" class="action-banner" hidden>
+      <span>
+        <strong>Instale o Snake Arena</strong>
+        <small>Abra como aplicativo e jogue em tela cheia.</small>
+      </span>
+      <button id="installNowButton" type="button">Instalar</button>
+      <button id="installDismissButton" class="action-banner__close" type="button" aria-label="Fechar">×</button>
+    </div>
+
+    <div id="updateBanner" class="action-banner action-banner--update" hidden>
+      <span>
+        <strong>Nova versão disponível</strong>
+        <small>Atualize para usar os arquivos mais recentes.</small>
+      </span>
+      <button id="updateNowButton" type="button">Atualizar</button>
+      <button id="updateDismissButton" class="action-banner__close" type="button" aria-label="Fechar">×</button>
+    </div>
+
+
+    <div id="rewardToast" class="reward-toast" role="status" aria-live="polite" hidden>
+      <span id="rewardToastIcon">🪙</span>
+      <div>
+        <small id="rewardToastLabel">Recompensa recebida</small>
+        <strong id="rewardToastName">+0 moedas</strong>
+      </div>
+    </div>
+
+    <div id="achievementToast" class="achievement-toast" role="status" aria-live="polite" hidden>
+      <span id="achievementToastIcon">🏅</span>
+      <div>
+        <small>Conquista desbloqueada</small>
+        <strong id="achievementToastName">Nova conquista</strong>
+      </div>
+    </div>
+
+    <aside id="debugHud" class="debug-hud debug-hud--hidden" aria-live="polite">
+      <span>Estado: <strong id="stateValue">MENU</strong></span>
+      <span>FPS: <strong id="fpsValue">0</strong></span>
+      <span>Posição: <strong id="positionValue">0, 0</strong></span>
+      <span>Zoom: <strong id="zoomValue">1.00</strong></span>
+      <span>Velocidade: <strong id="speedDebugValue">0</strong></span>
+      <span>Turbo: <strong id="boostDebugValue">0.00</strong></span>
+      <span>Entrada: <strong id="inputValue">mouse</strong></span>
+      <span>Qualidade: <strong id="qualityValue">auto</strong></span>
+      <span>Bots: <strong id="botsDebugValue">0</strong></span>
+      <span>Comidas: <strong id="foodValue">0</strong></span>
+      <span>Restos: <strong id="remainsValue">0</strong></span>
+      <span>Corpos: <strong id="collisionBodiesValue">0</strong></span>
+      <span>Células: <strong id="collisionCellsValue">0</strong></span>
+      <span>Mortes: <strong id="deathsValue">0</strong></span>
+      <span>Efeitos: <strong id="effectsValue">0</strong></span>
+      <span>Moedas: <strong id="coinsDebugValue">180</strong></span>
+      <span>Missões: <strong id="dailyDebugValue">0/3</strong></span>
+      <span>Nível: <strong id="levelDebugValue">1</strong></span>
+      <span>XP: <strong id="xpDebugValue">0</strong></span>
+      <span>Temporada: <strong id="seasonDebugValue">1/20</strong></span>
+      <span>Evento: <strong id="weeklyDebugValue">0/3</strong></span>
+      <span>Rating: <strong id="ratingDebugValue">1000</strong></span>
+      <span>Histórico: <strong id="historyDebugValue">0</strong></span>
+      <span>Sequência: <strong id="streakDebugValue">0</strong></span>
+      <span>Nuvem: <strong id="cloudDebugValue">local</strong></span>
+    </aside>
+  </main>
+
+  <script type="module" src="./js/boot.js?build=13-4"></script>
+</body>
+</html>

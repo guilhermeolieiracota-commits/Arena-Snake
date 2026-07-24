@@ -1,0 +1,133 @@
+# Snake Arena — Fase 13 Final
+
+Esta versão foi construída diretamente sobre a Fase 12 configurada. Nenhum sistema anterior foi recriado ou removido.
+
+## Novos recursos
+
+### Recuperação e segurança da conta
+
+- solicitação de recuperação por e-mail;
+- reenvio de confirmação de cadastro;
+- consumo automático do link de recuperação;
+- definição de nova senha;
+- alteração de senha para conta conectada;
+- sessão e save continuam separados;
+- tokens não entram no backup local.
+
+### Perfil público
+
+Cada jogador pode publicar:
+
+- apelido;
+- frase de até 80 caracteres;
+- skin;
+- título;
+- liga e rating;
+- nível;
+- sequência diária;
+- partidas;
+- eliminações;
+- melhor pontuação;
+- melhor massa;
+- vitórias.
+
+O perfil pode ser ocultado a qualquer momento.
+
+### Partidas da comunidade
+
+As partidas recentes podem ser sincronizadas separadamente do save privado.
+
+Dados públicos:
+
+- medalha;
+- pontuação;
+- posição;
+- massa;
+- eliminações;
+- duração;
+- rating;
+- liga;
+- data.
+
+O limite enviado por dispositivo é de 20 partidas recentes por sincronização.
+
+### Ranking global avançado
+
+- até 100 jogadores carregados;
+- busca por apelido ou ID;
+- filtro por liga;
+- ordenação por rating, pontuação, vitórias ou nível;
+- destaque do jogador atual;
+- acesso ao perfil público clicando no apelido.
+
+### Feed global
+
+A comunidade mostra as partidas públicas mais recentes. Clicar no jogador abre o perfil e as partidas recentes dele.
+
+### Diagnóstico da nuvem
+
+O diagnóstico verifica:
+
+- configuração pública;
+- conexão do dispositivo;
+- tabela do placar;
+- tabela de perfis;
+- tabela de partidas;
+- sessão autenticada;
+- save privado.
+
+O resultado fica salvo localmente para consulta offline.
+
+### Privacidade
+
+Ao desativar o perfil público:
+
+- o placar oculta o jogador;
+- o perfil público fica invisível;
+- partidas públicas anteriores são ocultadas;
+- o save privado continua disponível para a própria conta.
+
+A segurança de escrita usa o usuário autenticado e políticas RLS. Nenhuma chave secreta foi adicionada.
+
+## Atualização do Supabase
+
+Execute:
+
+`supabase/snake-arena-phase13-upgrade.sql`
+
+Instruções completas:
+
+`ATIVAR-FASE-13.md`
+
+## Save e offline
+
+- save versão 7;
+- cache `snake-arena-v13-1`;
+- dados comunitários possuem cache local;
+- o jogo continua funcional quando a internet cai;
+- falhas da comunidade não interrompem a partida.
+
+## Validação
+
+Execute:
+
+```bash
+node ./tools/validate-project.mjs
+node ./tools/test-phase9.mjs
+node ./tools/test-phase10.mjs
+node ./tools/test-phase11.mjs
+node ./tools/test-phase12.mjs
+node ./tools/test-phase13.mjs
+```
+
+## Próxima fase possível
+
+A próxima fase pode adicionar:
+
+- amigos;
+- solicitações de amizade;
+- comparação direta de perfis;
+- grupos ou clãs;
+- desafios entre jogadores;
+- notificações sociais;
+- temporadas globais administradas pelo Supabase.
