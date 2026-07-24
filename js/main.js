@@ -135,6 +135,12 @@ const elements = {
   qualitySelect: document.querySelector("#qualitySelect"),
   difficultySelect:
     document.querySelector("#difficultySelect"),
+  controlModeMenuValue:
+    document.querySelector("#controlModeMenuValue"),
+  qualityMenuValue:
+    document.querySelector("#qualityMenuValue"),
+  difficultyMenuValue:
+    document.querySelector("#difficultyMenuValue"),
   selectedSkinMenuValue:
     document.querySelector("#selectedSkinMenuValue"),
   coinBalanceMenuValue:
@@ -1244,6 +1250,21 @@ const syncMenuControls = (
 
   elements.difficultySelect.value =
     settings.difficulty;
+
+  elements.controlModeMenuValue.textContent =
+    elements.controlModeSelect.options[
+      elements.controlModeSelect.selectedIndex
+    ]?.textContent || "Seguir o toque";
+
+  elements.qualityMenuValue.textContent =
+    elements.qualitySelect.options[
+      elements.qualitySelect.selectedIndex
+    ]?.textContent || "Automática";
+
+  elements.difficultyMenuValue.textContent =
+    elements.difficultySelect.options[
+      elements.difficultySelect.selectedIndex
+    ]?.textContent || "Normal";
 
   const skin = getSkinById(
     settings.skinId
