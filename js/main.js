@@ -568,6 +568,7 @@ let achievementToastTimer = null;
 let rewardToastTimer = null;
 let toastQueueTimer = null;
 let updateBannerTimer = null;
+let pendingUpdateBanner = false;
 let toastQueueActive = false;
 const toastQueue = [];
 let lastAchievementEvaluationTime = -Infinity;
@@ -731,10 +732,22 @@ const setGameInterfaceVisibility = (
 
   elements.killFeed.hidden = !visible;
 
+  if (
+    visible &&
+    !elements.updateBanner.hidden
+  ) {
+    pendingUpdateBanner = true;
+    hideUpdateBanner();
+  }
+
   document.body.classList.toggle(
     "gameplay-active",
     visible
   );
+
+  if (!visible) {
+    syncPendingUpdateBanner();
+  }
 };
 
 const restoreOverlayRoot = () => {
@@ -2766,7 +2779,7 @@ const setNetworkStatus = (
   renderOnlineState();
 };
 
-const hideUpdateBanner = () => {
+const hideUpdateBanner = ({ clearPending = false } = {}) => {
   window.clearTimeout(
     updateBannerTimer
   );
@@ -2777,9 +2790,13 @@ const hideUpdateBanner = () => {
 
   elements.updateBanner.hidden =
     true;
+
+  if (clearPending) {
+    pendingUpdateBanner = false;
+  }
 };
 
-const showUpdateAvailable = () => {
+const showUpdateBannerNow = () => {
   window.clearTimeout(
     updateBannerTimer
   );
@@ -2791,11 +2808,38 @@ const showUpdateAvailable = () => {
     "action-banner--temporary-visible"
   );
 
+  pendingUpdateBanner = false;
+
   updateBannerTimer =
     window.setTimeout(
-      hideUpdateBanner,
+      () => hideUpdateBanner(),
       6500
     );
+};
+
+const syncPendingUpdateBanner = () => {
+  if (
+    pendingUpdateBanner &&
+    !document.body.classList.contains(
+      "gameplay-active"
+    )
+  ) {
+    showUpdateBannerNow();
+  }
+};
+
+const showUpdateAvailable = () => {
+  pendingUpdateBanner = true;
+
+  if (
+    document.body.classList.contains(
+      "gameplay-active"
+    )
+  ) {
+    return;
+  }
+
+  showUpdateBannerNow();
 };
 
 const runInstallPrompt = async () => {
@@ -4529,7 +4573,7 @@ elements.updateNowButton.addEventListener(
 
 elements.updateDismissButton.addEventListener(
   "click",
-  hideUpdateBanner
+  () => hideUpdateBanner({ clearPending: true })
 );
 
 document.addEventListener(

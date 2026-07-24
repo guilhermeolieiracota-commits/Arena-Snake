@@ -911,3 +911,68 @@
     display: none;
   }
 }
+
+/* Fase 15 — layout inicial mais limpo e proporcional */
+@media (max-width: 980px) {
+  .panel--menu-redesign {
+    padding: 24px;
+  }
+
+  .menu-shell {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .menu-shell__side .menu-tools {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .panel--menu-redesign {
+    width: min(100%, 470px);
+    padding: 22px 18px;
+  }
+
+  .menu-shell__main,
+  .menu-shell__side {
+    gap: 14px;
+  }
+
+  .menu-shell__intro {
+    gap: 10px;
+  }
+
+  .menu-shell__intro .subtitle {
+    max-width: none;
+  }
+
+  .menu-primary-actions .button {
+    min-height: 58px;
+  }
+
+  .menu-shell__side .menu-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .menu-tool-button {
+    min-height: 76px;
+  }
+}
+
+@media (max-width: 430px) {
+  .panel--menu-redesign {
+    padding: 20px 16px;
+    border-radius: 22px;
+  }
+
+  .menu-shell__side .menu-tools {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .menu-tool-button {
+    min-height: 72px;
+    font-size: 0.88rem;
+  }
+}

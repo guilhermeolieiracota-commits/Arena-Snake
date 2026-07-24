@@ -3015,3 +3015,82 @@ h2 {
   width: min(320px, 82vw);
   margin-top: 8px;
 }
+
+/* Fase 15 — menu reorganizado para PC e celular */
+.panel--menu-redesign {
+  width: min(100%, 1120px);
+  padding: 30px;
+}
+
+.menu-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(320px, 0.98fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.menu-shell__main,
+.menu-shell__side {
+  display: grid;
+  gap: 16px;
+}
+
+.menu-shell__main {
+  align-content: start;
+}
+
+.menu-shell__intro {
+  display: grid;
+  gap: 12px;
+}
+
+.menu-shell__intro .subtitle {
+  max-width: 58ch;
+}
+
+.form-grid--menu {
+  margin-top: 2px;
+}
+
+.menu-primary-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.menu-primary-actions .button {
+  margin-top: 0;
+  min-height: 64px;
+  font-size: 1.06rem;
+}
+
+.menu-shell__side .selected-skin-line,
+.menu-shell__side .menu-wallet,
+.menu-shell__side .profile-summary-button,
+.menu-shell__side .season-menu-summary,
+.menu-shell__side .competitive-summary-button,
+.menu-shell__side .online-summary-button {
+  margin-bottom: 0;
+}
+
+.menu-shell__side .menu-tools {
+  margin-top: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.menu-tool-button {
+  min-height: 82px;
+}
+
+.menu-tool-button span {
+  font-size: 1.3rem;
+}
+
+.control-tips {
+  margin-top: 2px;
+}
+
+.helper {
+  margin-top: 0;
+}

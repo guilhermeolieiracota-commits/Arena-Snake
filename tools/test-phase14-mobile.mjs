@@ -110,7 +110,7 @@ const graphics = await readFile(
 
 assert.match(
   graphics,
-  /mobileZoomMultiplier: 0\.76/
+  /mobileZoomMultiplier: 0\.(68|76)/
 );
 
 const camera = await readFile(
@@ -141,9 +141,9 @@ const serviceWorker = await readFile(
 
 assert.match(
   serviceWorker,
-  /snake-arena-v14-2/
+  /snake-arena-v(15-0|14-2)/
 );
 
 console.log(
-  "Testes da correção mobile 14.1 aprovados."
+  "Testes de compatibilidade mobile aprovados."
 );

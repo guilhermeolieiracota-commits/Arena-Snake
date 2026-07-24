@@ -22,6 +22,8 @@ export class Food {
     this.replaceOnCollect = true;
     this.isNatural = true;
     this.spawnOrder = 0;
+    this.glowScale = 1;
+    this.variant = "default";
   }
 
   reset({
@@ -37,6 +39,8 @@ export class Food {
     replaceOnCollect = true,
     isNatural = true,
     spawnOrder = 0,
+    glowScale = 1,
+    variant = "default",
   }) {
     this.active = true;
     this.x = x;
@@ -52,6 +56,8 @@ export class Food {
     this.replaceOnCollect = replaceOnCollect;
     this.isNatural = isNatural;
     this.spawnOrder = spawnOrder;
+    this.glowScale = glowScale;
+    this.variant = variant;
   }
 
   moveToward(targetX, targetY, delta, speed) {
@@ -75,5 +81,7 @@ export class Food {
     this.isNatural = false;
     this.replaceOnCollect = false;
     this.spawnOrder = 0;
+    this.glowScale = 1;
+    this.variant = "default";
   }
 }

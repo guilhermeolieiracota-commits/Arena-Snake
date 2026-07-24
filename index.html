@@ -39,188 +39,196 @@
     <canvas id="gameCanvas" aria-label="Arena do Snake Arena"></canvas>
 
     <section id="menuScreen" class="screen screen--visible" aria-labelledby="gameTitle">
-      <div class="panel panel--hero">
-        <p class="eyebrow">Mobile otimizado, borda segura e predação • Fase 14</p>
-        <h1 id="gameTitle">Snake Arena</h1>
-        <p class="subtitle">
-          Escolha sua aparência, ajuste os controles e dispute uma arena com
-          bots, colisões, ranking, conta opcional, sincronização em nuvem e placar global.
-        </p>
+      <div class="panel panel--hero panel--menu-redesign">
+        <div class="menu-shell">
+          <div class="menu-shell__main">
+            <div class="menu-shell__intro">
+              <p class="eyebrow">Layout refinado para PC e celular • Fase 15</p>
+              <h1 id="gameTitle">Snake Arena</h1>
+              <p class="subtitle">
+                Escolha sua aparência, ajuste os controles e dispute uma arena com
+                bots, colisões, ranking, conta opcional, sincronização em nuvem e placar global.
+              </p>
+            </div>
 
-        <div class="form-grid">
-          <label class="field field--wide">
-            <span>Seu apelido</span>
-            <input id="nicknameInput" type="text" maxlength="16" value="Jogador" autocomplete="off">
-          </label>
+            <div class="form-grid form-grid--menu">
+              <label class="field field--wide">
+                <span>Seu apelido</span>
+                <input id="nicknameInput" type="text" maxlength="16" value="Jogador" autocomplete="off">
+              </label>
 
-          <label class="field">
-            <span>Controle mobile</span>
-            <select id="controlModeSelect">
-              <option value="follow">Seguir o toque</option>
-              <option value="joystick">Joystick virtual</option>
-            </select>
-          </label>
+              <label class="field">
+                <span>Controle mobile</span>
+                <select id="controlModeSelect">
+                  <option value="follow">Seguir o toque</option>
+                  <option value="joystick">Joystick virtual</option>
+                </select>
+              </label>
 
-          <label class="field">
-            <span>Qualidade gráfica</span>
-            <select id="qualitySelect">
-              <option value="auto">Automática</option>
-              <option value="low">Baixa</option>
-              <option value="medium">Média</option>
-              <option value="high">Alta</option>
-            </select>
-          </label>
+              <label class="field">
+                <span>Qualidade gráfica</span>
+                <select id="qualitySelect">
+                  <option value="auto">Automática</option>
+                  <option value="low">Baixa</option>
+                  <option value="medium">Média</option>
+                  <option value="high">Alta</option>
+                </select>
+              </label>
 
-          <label class="field field--wide">
-            <span>Dificuldade dos bots</span>
-            <select id="difficultySelect">
-              <option value="calm">Tranquila</option>
-              <option value="normal">Normal</option>
-              <option value="intense">Intensa</option>
-            </select>
-          </label>
+              <label class="field field--wide">
+                <span>Dificuldade dos bots</span>
+                <select id="difficultySelect">
+                  <option value="calm">Tranquila</option>
+                  <option value="normal">Normal</option>
+                  <option value="intense">Intensa</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="menu-primary-actions">
+              <button id="startButton" class="button button--primary" type="button">
+                Entrar na arena
+              </button>
+            </div>
+
+            <div class="control-tips" aria-label="Controles">
+              <span>🖱️ Mouse direciona</span>
+              <span>⚡ Clique ou Espaço</span>
+              <span>📱 Toque ou joystick</span>
+              <span>🛡️ Proteção ao nascer</span>
+              <span>🏆 Ranking salvo</span>
+            </div>
+
+            <p class="helper">
+              O modo local continua completo. Ao conectar uma conta, você pode enviar
+              o save para a nuvem, restaurar em outro dispositivo e disputar o placar global.
+            </p>
+          </div>
+
+          <div class="menu-shell__side">
+            <div class="selected-skin-line">
+              <span>Skin atual</span>
+              <strong id="selectedSkinMenuValue">Menta Neon</strong>
+            </div>
+
+            <div class="menu-wallet">
+              <span>
+                <small>Saldo</small>
+                <strong>🪙 <span id="coinBalanceMenuValue">180</span></strong>
+              </span>
+              <button id="openDailySummaryButton" type="button">
+                <small>Missões de hoje</small>
+                <strong id="dailySummaryValue">0/3</strong>
+              </button>
+            </div>
+
+            <button id="openProfileSummaryButton" class="profile-summary-button" type="button">
+              <span class="profile-summary-button__level">
+                <small>Nível</small>
+                <strong id="profileLevelMenuValue">1</strong>
+              </span>
+              <span>
+                <small id="profileTitleMenuValue">Novato da Arena</small>
+                <strong id="profileXpMenuValue">0/105 XP</strong>
+              </span>
+              <span class="profile-summary-button__arrow" aria-hidden="true">›</span>
+            </button>
+
+            <div class="season-menu-summary">
+              <button id="openSeasonSummaryButton" type="button">
+                <small>Temporada</small>
+                <strong id="seasonMenuValue">Nível 1/20</strong>
+              </button>
+              <button id="openWeeklySummaryButton" type="button">
+                <small>Evento semanal</small>
+                <strong id="weeklyMenuValue">0/3</strong>
+              </button>
+            </div>
+
+            <button id="openCompetitiveSummaryButton" class="competitive-summary-button" type="button">
+              <span id="competitiveLeagueIconMenu">🥉</span>
+              <span>
+                <small id="competitiveLeagueMenuValue">Bronze</small>
+                <strong><span id="competitiveRatingMenuValue">1000</span> pontos</strong>
+              </span>
+              <span class="competitive-summary-button__streak">
+                🔥 <strong id="streakMenuValue">0</strong>
+              </span>
+            </button>
+
+            <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
+              <span id="onlineSummaryIcon">☁️</span>
+              <span>
+                <small id="onlineSummaryLabel">Modo local</small>
+                <strong id="onlineSummaryValue">Conectar conta</strong>
+              </span>
+              <span id="onlineSummaryState" class="online-summary-button__state">Offline seguro</span>
+            </button>
+
+            <div class="menu-tools">
+              <button id="openCompetitiveButton" class="menu-tool-button menu-tool-button--competitive" type="button">
+                <span>🏆</span>
+                Competitivo
+              </button>
+              <button id="openHistoryButton" class="menu-tool-button menu-tool-button--history" type="button">
+                <span>📜</span>
+                Histórico
+              </button>
+              <button id="openDataButton" class="menu-tool-button menu-tool-button--data" type="button">
+                <span>💾</span>
+                Dados
+              </button>
+              <button id="openOnlineButton" class="menu-tool-button menu-tool-button--online" type="button">
+                <span>☁️</span>
+                Online
+              </button>
+              <button id="openProfileButton" class="menu-tool-button menu-tool-button--profile" type="button">
+                <span>👤</span>
+                Perfil
+              </button>
+              <button id="openSeasonButton" class="menu-tool-button menu-tool-button--season" type="button">
+                <span>🌀</span>
+                Temporada
+              </button>
+              <button id="openWeeklyButton" class="menu-tool-button menu-tool-button--weekly" type="button">
+                <span>🎪</span>
+                Evento
+              </button>
+              <button id="openSkinsButton" class="menu-tool-button" type="button">
+                <span>🎨</span>
+                Skins
+              </button>
+              <button id="openDailyButton" class="menu-tool-button menu-tool-button--daily" type="button">
+                <span>📅</span>
+                Missões
+              </button>
+              <button id="openShopButton" class="menu-tool-button menu-tool-button--shop" type="button">
+                <span>🛍️</span>
+                Loja
+              </button>
+              <button id="openStatsButton" class="menu-tool-button" type="button">
+                <span>📊</span>
+                Recordes
+              </button>
+              <button id="openAchievementsButton" class="menu-tool-button" type="button">
+                <span>🏅</span>
+                Conquistas
+              </button>
+              <button id="openSettingsButton" class="menu-tool-button" type="button">
+                <span>⚙️</span>
+                Configurações
+              </button>
+              <button id="menuFullscreenButton" class="menu-tool-button" type="button">
+                <span>⛶</span>
+                Tela cheia
+              </button>
+              <button id="installAppButton" class="menu-tool-button menu-tool-button--accent pwa-install-hidden" type="button">
+                <span>⬇️</span>
+                Instalar app
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div class="selected-skin-line">
-          <span>Skin atual</span>
-          <strong id="selectedSkinMenuValue">Menta Neon</strong>
-        </div>
-
-        <div class="menu-wallet">
-          <span>
-            <small>Saldo</small>
-            <strong>🪙 <span id="coinBalanceMenuValue">180</span></strong>
-          </span>
-          <button id="openDailySummaryButton" type="button">
-            <small>Missões de hoje</small>
-            <strong id="dailySummaryValue">0/3</strong>
-          </button>
-        </div>
-
-
-        <button id="openProfileSummaryButton" class="profile-summary-button" type="button">
-          <span class="profile-summary-button__level">
-            <small>Nível</small>
-            <strong id="profileLevelMenuValue">1</strong>
-          </span>
-          <span>
-            <small id="profileTitleMenuValue">Novato da Arena</small>
-            <strong id="profileXpMenuValue">0/105 XP</strong>
-          </span>
-          <span class="profile-summary-button__arrow" aria-hidden="true">›</span>
-        </button>
-
-        <div class="season-menu-summary">
-          <button id="openSeasonSummaryButton" type="button">
-            <small>Temporada</small>
-            <strong id="seasonMenuValue">Nível 1/20</strong>
-          </button>
-          <button id="openWeeklySummaryButton" type="button">
-            <small>Evento semanal</small>
-            <strong id="weeklyMenuValue">0/3</strong>
-          </button>
-        </div>
-
-
-        <button id="openCompetitiveSummaryButton" class="competitive-summary-button" type="button">
-          <span id="competitiveLeagueIconMenu">🥉</span>
-          <span>
-            <small id="competitiveLeagueMenuValue">Bronze</small>
-            <strong><span id="competitiveRatingMenuValue">1000</span> pontos</strong>
-          </span>
-          <span class="competitive-summary-button__streak">
-            🔥 <strong id="streakMenuValue">0</strong>
-          </span>
-        </button>
-
-        <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
-          <span id="onlineSummaryIcon">☁️</span>
-          <span>
-            <small id="onlineSummaryLabel">Modo local</small>
-            <strong id="onlineSummaryValue">Conectar conta</strong>
-          </span>
-          <span id="onlineSummaryState" class="online-summary-button__state">Offline seguro</span>
-        </button>
-
-        <button id="startButton" class="button button--primary" type="button">
-          Entrar na arena
-        </button>
-
-        <div class="menu-tools">
-          <button id="openCompetitiveButton" class="menu-tool-button menu-tool-button--competitive" type="button">
-            <span>🏆</span>
-            Competitivo
-          </button>
-          <button id="openHistoryButton" class="menu-tool-button menu-tool-button--history" type="button">
-            <span>📜</span>
-            Histórico
-          </button>
-          <button id="openDataButton" class="menu-tool-button menu-tool-button--data" type="button">
-            <span>💾</span>
-            Dados
-          </button>
-          <button id="openOnlineButton" class="menu-tool-button menu-tool-button--online" type="button">
-            <span>☁️</span>
-            Online
-          </button>
-          <button id="openProfileButton" class="menu-tool-button menu-tool-button--profile" type="button">
-            <span>👤</span>
-            Perfil
-          </button>
-          <button id="openSeasonButton" class="menu-tool-button menu-tool-button--season" type="button">
-            <span>🌀</span>
-            Temporada
-          </button>
-          <button id="openWeeklyButton" class="menu-tool-button menu-tool-button--weekly" type="button">
-            <span>🎪</span>
-            Evento
-          </button>
-          <button id="openSkinsButton" class="menu-tool-button" type="button">
-            <span>🎨</span>
-            Skins
-          </button>
-          <button id="openDailyButton" class="menu-tool-button menu-tool-button--daily" type="button">
-            <span>📅</span>
-            Missões
-          </button>
-          <button id="openShopButton" class="menu-tool-button menu-tool-button--shop" type="button">
-            <span>🛍️</span>
-            Loja
-          </button>
-          <button id="openStatsButton" class="menu-tool-button" type="button">
-            <span>📊</span>
-            Recordes
-          </button>
-          <button id="openAchievementsButton" class="menu-tool-button" type="button">
-            <span>🏅</span>
-            Conquistas
-          </button>
-          <button id="openSettingsButton" class="menu-tool-button" type="button">
-            <span>⚙️</span>
-            Configurações
-          </button>
-          <button id="menuFullscreenButton" class="menu-tool-button" type="button">
-            <span>⛶</span>
-            Tela cheia
-          </button>
-          <button id="installAppButton" class="menu-tool-button menu-tool-button--accent pwa-install-hidden" type="button">
-            <span>⬇️</span>
-            Instalar app
-          </button>
-        </div>
-
-        <div class="control-tips" aria-label="Controles">
-          <span>🖱️ Mouse direciona</span>
-          <span>⚡ Clique ou Espaço</span>
-          <span>📱 Toque ou joystick</span>
-          <span>🛡️ Proteção ao nascer</span>
-          <span>🏆 Ranking salvo</span>
-        </div>
-
-        <p class="helper">
-          O modo local continua completo. Ao conectar uma conta, você pode enviar
-          o save para a nuvem, restaurar em outro dispositivo e disputar o placar global.
-        </p>
       </div>
     </section>
 

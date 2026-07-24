@@ -56,10 +56,13 @@ export class FoodRenderer {
     const isRemains =
       food.type === FoodType.REMAINS;
 
+    const glowScale =
+      Number(food.glowScale) || 1;
+
     const pulseSpeed = isBoostDrop
       ? 5.2
       : isRemains
-        ? 2.6
+        ? 3.2
         : 3.4;
 
     const pulse =
@@ -70,7 +73,7 @@ export class FoodRenderer {
         (isBoostDrop
           ? 0.18
           : isRemains
-            ? 0.10
+            ? 0.16
             : 0.12);
 
     const radius = food.radius * pulse;
@@ -86,38 +89,60 @@ export class FoodRenderer {
             : isBoostDrop
               ? -1.25
               : isRemains
-                ? 0.35
+                ? 0.42
                 : 0.2)
     );
 
     if (quality.glowEnabled) {
-      context.globalAlpha = isSpecial
-        ? 0.34
-        : isBoostDrop
-          ? 0.28
-          : isRemains
-            ? 0.32
+      if (isRemains) {
+        context.globalAlpha = 0.22;
+        context.fillStyle = food.secondaryColor;
+        context.beginPath();
+        context.arc(
+          0,
+          0,
+          radius * 2.9 * glowScale,
+          0,
+          Math.PI * 2
+        );
+        context.fill();
+
+        context.globalAlpha = 0.18;
+        context.fillStyle = food.color;
+        context.beginPath();
+        context.arc(
+          0,
+          0,
+          radius * 2.15 * glowScale,
+          0,
+          Math.PI * 2
+        );
+        context.fill();
+      } else {
+        context.globalAlpha = isSpecial
+          ? 0.34
+          : isBoostDrop
+            ? 0.28
             : 0.20;
 
-      context.fillStyle =
-        food.secondaryColor;
+        context.fillStyle =
+          food.secondaryColor;
 
-      context.beginPath();
-      context.arc(
-        0,
-        0,
-        radius *
-          (isSpecial
-            ? 2.25
-            : isBoostDrop
-              ? 2.05
-              : isRemains
-                ? 2.15
+        context.beginPath();
+        context.arc(
+          0,
+          0,
+          radius *
+            (isSpecial
+              ? 2.25
+              : isBoostDrop
+                ? 2.05
                 : 1.85),
-        0,
-        Math.PI * 2
-      );
-      context.fill();
+          0,
+          Math.PI * 2
+        );
+        context.fill();
+      }
     }
 
     context.globalAlpha = 1;
@@ -138,6 +163,27 @@ export class FoodRenderer {
         context,
         radius
       );
+
+      context.lineWidth =
+        Math.max(1.2, radius * 0.12);
+      context.strokeStyle =
+        "rgba(255, 255, 255, 0.82)";
+      context.stroke();
+
+      context.globalAlpha = 0.56;
+      context.strokeStyle = food.secondaryColor;
+      context.lineWidth =
+        Math.max(1, radius * 0.18);
+      context.beginPath();
+      context.arc(
+        0,
+        0,
+        radius * 1.18,
+        0,
+        Math.PI * 2
+      );
+      context.stroke();
+      context.globalAlpha = 1;
     } else {
       context.beginPath();
       context.arc(
@@ -151,13 +197,15 @@ export class FoodRenderer {
     }
 
     context.fillStyle =
-      "rgba(255, 255, 255, 0.72)";
+      isRemains
+        ? "rgba(255, 255, 255, 0.86)"
+        : "rgba(255, 255, 255, 0.72)";
 
     context.beginPath();
     context.arc(
       -radius * 0.28,
       -radius * 0.32,
-      radius * 0.30,
+      radius * (isRemains ? 0.34 : 0.30),
       0,
       Math.PI * 2
     );
@@ -247,9 +295,9 @@ export class FoodRenderer {
 
       const variation =
         point % 3 === 0
-          ? 1
+          ? 1.02
           : point % 3 === 1
-            ? 0.82
+            ? 0.76
             : 0.92;
 
       const x =

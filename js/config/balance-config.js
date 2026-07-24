@@ -78,12 +78,12 @@ export const BALANCE_CONFIG = Object.freeze({
   }),
 
   death: Object.freeze({
-    remainsSegmentStep: 2,
-    remainsMinimum: 10,
-    remainsMaximum: 105,
-    remainsMassShare: 0.72,
-    remainsRadiusMin: 3.8,
-    remainsRadiusMax: 8.8,
+    remainsSegmentStep: 3,
+    remainsMinimum: 8,
+    remainsMaximum: 72,
+    remainsMassShare: 0.96,
+    remainsRadiusMin: 6.2,
+    remainsRadiusMax: 15.4,
     maximumWorldRemains: 820,
     playerGameOverDelay: 0.10,
     killFeedSeconds: 4.5,

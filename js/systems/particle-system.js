@@ -85,7 +85,7 @@ export class ParticleSystem {
       event.type === FoodType.SPECIAL
         ? 14
         : event.type === FoodType.REMAINS
-          ? 10
+          ? 14
           : event.type === FoodType.BOOST_DROP
             ? 5
             : 7;
@@ -122,7 +122,11 @@ export class ParticleSystem {
         life: randomBetween(0.32, 0.72),
         size: randomBetween(
           1.8,
-          Math.max(2.4, event.radius * 0.72)
+          Math.max(
+            event.type === FoodType.REMAINS ? 4.4 : 2.4,
+            event.radius *
+              (event.type === FoodType.REMAINS ? 0.96 : 0.72)
+          )
         ),
         color:
           Math.random() < 0.5
@@ -208,8 +212,8 @@ export class ParticleSystem {
             Math.sin(angle) * speed,
           life: randomBetween(0.45, 1.05),
           size: randomBetween(
-            2.2,
-            snake.radius * 0.42
+            3.4,
+            snake.radius * 0.68
           ),
           color:
             Math.random() < 0.5

@@ -280,7 +280,7 @@ export class FoodSystem {
     );
 
     const totalMass =
-      Math.max(8, snake.mass) *
+      Math.max(16, snake.mass) *
       BALANCE_CONFIG.death.remainsMassShare;
 
     const massPerRemain =
@@ -327,29 +327,35 @@ export class FoodSystem {
         remainIndex /
         Math.max(remainsCount - 1, 1);
 
+      const clusterScale =
+        1.28 - sizeProgress * 0.22;
+
+      const remainRadius =
+        randomBetween(
+          BALANCE_CONFIG.death.remainsRadiusMin,
+          BALANCE_CONFIG.death.remainsRadiusMax
+        ) * clusterScale;
+
       food.reset({
         x:
           segment.x +
           randomBetween(
-            -snake.radius * 0.42,
-            snake.radius * 0.42
+            -snake.radius * 0.56,
+            snake.radius * 0.56
           ),
         y:
           segment.y +
           randomBetween(
-            -snake.radius * 0.42,
-            snake.radius * 0.42
+            -snake.radius * 0.56,
+            snake.radius * 0.56
           ),
-        radius: randomBetween(
-          BALANCE_CONFIG.death.remainsRadiusMin,
-          BALANCE_CONFIG.death.remainsRadiusMax
-        ) *
-          (1 - sizeProgress * 0.20),
+        radius: remainRadius,
         scoreValue: Math.max(
-          1,
-          Math.round(massPerRemain * 0.55)
+          2,
+          Math.round(massPerRemain * 0.9)
         ),
-        massValue: massPerRemain,
+        massValue:
+          massPerRemain * 1.28,
         type: FoodType.REMAINS,
         color: snake.primaryColor,
         secondaryColor:
@@ -358,6 +364,8 @@ export class FoodSystem {
         replaceOnCollect: false,
         isNatural: false,
         spawnOrder: this.spawnOrder++,
+        glowScale: 1.45,
+        variant: "death-remains",
       });
 
       this.activateFood(food);
@@ -496,6 +504,8 @@ export class FoodSystem {
       type: food.type,
       color: food.color,
       secondaryColor: food.secondaryColor,
+      glowScale: food.glowScale,
+      variant: food.variant,
     };
 
     const index = food.activeIndex;
