@@ -1,0 +1,16 @@
+export const CAUTIOUS_BEHAVIOR = Object.freeze({
+  id: "cautious",
+  label: "Cauteloso",
+  foodWeight: 0.92,
+  specialFoodWeight: 1.02,
+  boostDropWeight: 0.72,
+  dangerWeight: 2.15,
+  separationWeight: 1.50,
+  boundaryWeight: 1.62,
+  preyWeight: 0,
+  wanderWeight: 0.26,
+  boostToFoodChance: 0.08,
+  escapeBoostChance: 0.88,
+  chaseBoostChance: 0,
+  preferredFoodDistance: 500,
+});
