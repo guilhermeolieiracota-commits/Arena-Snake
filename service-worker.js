@@ -1,4 +1,4 @@
-const CACHE_NAME = "snake-arena-v15-4";
+const CACHE_NAME = "snake-arena-v15-4-1";
 
 const APP_SHELL = [
   "./",

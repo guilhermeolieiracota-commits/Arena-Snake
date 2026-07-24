@@ -1,8 +1,8 @@
-# Snake Arena — Fase 15.4 Final
+# Snake Arena — Fase 15.4.1 Final
 
 Esta versão foi construída sobre a Fase 15.3, sem recriar o projeto do zero.
 
-## Novidades da Fase 15.4
+## Novidades da Fase 15.4.1
 
 Esta atualização foca em fidelidade visual ao mockup aprovado da nova tela inicial.
 
@@ -12,7 +12,10 @@ Esta atualização foca em fidelidade visual ao mockup aprovado da nova tela ini
 - ajustes rápidos ficaram compactos e fiéis ao design aprovado;
 - cartões `Progresso`, `Personalizar` e `Sistema` ficaram mais minimalistas e recolhidos por padrão;
 - versão mobile ficou mais próxima da aparência planejada;
-- cache offline atualizado para `snake-arena-v15-4`.
+- cache offline atualizado para `snake-arena-v15-4-1`.
+- correção do topo no mobile com reset de rolagem ao abrir/recarregar.
+- banner do cabeçalho embutido diretamente no HTML para não falhar no carregamento.
+- alinhamento dos ícones refinado para evitar descentralização visual.
 
 Detalhes completos: `ALTERACOES-FASE-15-4.md`.
 

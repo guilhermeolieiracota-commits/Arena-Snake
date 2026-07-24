@@ -1355,3 +1355,9 @@
     font-size: 1.55rem;
   }
 }
+
+@media (max-width: 560px) {
+  .menu-fidelity__banner {
+    min-height: 132px;
+  }
+}

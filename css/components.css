@@ -3785,3 +3785,30 @@ body.gameplay-active #installBanner {
   gap: 14px;
   padding: 0 24px 24px;
 }
+
+/* Fase 15.4.1 — correções do topo e alinhamento */
+.menu-fidelity__banner {
+  min-height: clamp(180px, 42vw, 332px);
+}
+
+.menu-fidelity__banner img {
+  width: 100%;
+  height: auto;
+}
+
+.menu-setting-compact__icon,
+.menu-summary-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-setting-compact__icon img,
+.menu-summary-card__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 4px;
+  box-sizing: border-box;
+}
