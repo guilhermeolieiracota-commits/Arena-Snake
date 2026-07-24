@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Snake Arena">
   <meta name="description" content="Snake Arena com perfil público, comunidade online, recuperação de conta, ranking global avançado, nuvem e modo offline.">
-  <title>Snake Arena — Fase 15.3</title>
+  <title>Snake Arena — Fase 15.4</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
@@ -39,102 +39,199 @@
     <canvas id="gameCanvas" aria-label="Arena do Snake Arena"></canvas>
 
     <section id="menuScreen" class="screen screen--visible" aria-labelledby="gameTitle">
-      <div class="panel panel--hero panel--menu-refined">
-        <div class="menu-refined">
-          <div class="menu-refined__hero">
-            <div class="menu-brand-strip">
-              <div class="menu-brand-mark" aria-hidden="true">S</div>
-              <p>Layout refinado<br>para PC e celular</p>
-            </div>
-
-            <div class="menu-refined__hero-grid">
-              <div class="menu-refined__copy">
-                <h1 id="gameTitle" class="menu-title">
-                  <span>Snake</span>
-                  <strong>Arena</strong>
-                </h1>
-                <p class="menu-refined__subtitle">
-                  Entre na arena, dispute partidas com bots ou jogadores
-                  e mostre que você é o melhor.
-                </p>
-              </div>
-
-              <div class="menu-refined__art" aria-hidden="true">
-                <div class="menu-snake-art">
-                  <span class="menu-snake-art__glow"></span>
-                  <span class="menu-snake-art__curve menu-snake-art__curve--one"></span>
-                  <span class="menu-snake-art__curve menu-snake-art__curve--two"></span>
-                  <span class="menu-snake-art__head"></span>
-                </div>
-              </div>
-            </div>
-
-            <label class="field field--wide menu-refined__nickname-field">
-              <span>Seu apelido</span>
-              <div class="menu-refined__nickname-box">
-                <input id="nicknameInput" type="text" maxlength="16" value="Jogador" autocomplete="off">
-                <button type="button" class="menu-refined__edit" aria-label="Editar apelido" onclick="document.getElementById('nicknameInput').focus()">✎</button>
-              </div>
-            </label>
-
-            <button id="startButton" class="button button--primary menu-refined__start" type="button">
-              <span class="menu-refined__start-icon" aria-hidden="true">S</span>
-              <span>Entrar na arena</span>
-            </button>
+      <div class="panel panel--hero panel--menu-fidelity">
+        <div class="menu-fidelity">
+          <div class="menu-fidelity__banner">
+            <img src="./assets/ui/menu-hero-fase-15-4.png" alt="Snake Arena - Layout refinado para PC e celular">
+            <h1 id="gameTitle" class="sr-only">Snake Arena</h1>
           </div>
 
-          <section class="menu-quick-settings" aria-labelledby="quickSettingsTitle">
-            <div class="menu-panel-title-row">
+          <label class="field field--wide menu-fidelity__nickname-field">
+            <span>Seu apelido</span>
+            <div class="menu-fidelity__nickname-box">
+              <input id="nicknameInput" type="text" maxlength="16" value="Jogador" autocomplete="off">
+              <button type="button" class="menu-fidelity__edit" aria-label="Editar apelido" onclick="document.getElementById('nicknameInput').focus()">✎</button>
+            </div>
+          </label>
+
+          <button id="startButton" class="button button--primary menu-fidelity__start" type="button">
+            <span class="menu-fidelity__start-icon" aria-hidden="true">S</span>
+            <span>Entrar na arena</span>
+          </button>
+
+          <section class="menu-quick-settings menu-quick-settings--fidelity" aria-labelledby="quickSettingsTitle">
+            <div class="menu-panel-title-row menu-panel-title-row--fidelity">
+              <span class="menu-panel-title-row__glyph" aria-hidden="true">⌘</span>
               <p class="eyebrow" id="quickSettingsTitle">Ajustes rápidos</p>
             </div>
 
-            <div class="menu-setting-list">
-              <label class="menu-setting-item" for="controlModeSelect">
-                <span class="menu-setting-item__icon menu-setting-item__icon--green" aria-hidden="true">☝</span>
-                <span class="menu-setting-item__content">
+            <div class="menu-setting-list menu-setting-list--compact">
+              <label class="menu-setting-compact" for="controlModeSelect">
+                <span class="menu-setting-compact__icon" aria-hidden="true"><img src="./assets/ui/icon-touch.svg" alt=""></span>
+                <span class="menu-setting-compact__text">
                   <small>Controle mobile</small>
                   <strong id="controlModeMenuValue">Seguir o toque</strong>
                 </span>
-                <span class="menu-setting-item__control">
-                  <select id="controlModeSelect" aria-label="Controle mobile">
-                    <option value="follow">Seguir o toque</option>
-                    <option value="joystick">Joystick virtual</option>
-                  </select>
-                </span>
+                <span class="menu-setting-compact__arrow" aria-hidden="true">›</span>
+                <select id="controlModeSelect" aria-label="Controle mobile">
+                  <option value="follow">Seguir o toque</option>
+                  <option value="joystick">Joystick virtual</option>
+                </select>
               </label>
 
-              <label class="menu-setting-item" for="qualitySelect">
-                <span class="menu-setting-item__icon menu-setting-item__icon--purple" aria-hidden="true">▣</span>
-                <span class="menu-setting-item__content">
+              <label class="menu-setting-compact" for="qualitySelect">
+                <span class="menu-setting-compact__icon" aria-hidden="true"><img src="./assets/ui/icon-display.svg" alt=""></span>
+                <span class="menu-setting-compact__text">
                   <small>Qualidade gráfica</small>
                   <strong id="qualityMenuValue">Alta</strong>
                 </span>
-                <span class="menu-setting-item__control">
-                  <select id="qualitySelect" aria-label="Qualidade gráfica">
-                    <option value="auto">Automática</option>
-                    <option value="low">Baixa</option>
-                    <option value="medium">Média</option>
-                    <option value="high">Alta</option>
-                  </select>
-                </span>
+                <span class="menu-setting-compact__arrow" aria-hidden="true">›</span>
+                <select id="qualitySelect" aria-label="Qualidade gráfica">
+                  <option value="auto">Automática</option>
+                  <option value="low">Baixa</option>
+                  <option value="medium">Média</option>
+                  <option value="high">Alta</option>
+                </select>
               </label>
 
-              <label class="menu-setting-item" for="difficultySelect">
-                <span class="menu-setting-item__icon menu-setting-item__icon--blue" aria-hidden="true">🤖</span>
-                <span class="menu-setting-item__content">
+              <label class="menu-setting-compact" for="difficultySelect">
+                <span class="menu-setting-compact__icon" aria-hidden="true"><img src="./assets/ui/icon-bot.svg" alt=""></span>
+                <span class="menu-setting-compact__text">
                   <small>Dificuldade dos bots</small>
                   <strong id="difficultyMenuValue">Tranquila</strong>
                 </span>
-                <span class="menu-setting-item__control">
-                  <select id="difficultySelect" aria-label="Dificuldade dos bots">
-                    <option value="calm">Tranquila</option>
-                    <option value="normal">Normal</option>
-                    <option value="intense">Intensa</option>
-                  </select>
-                </span>
+                <span class="menu-setting-compact__arrow" aria-hidden="true">›</span>
+                <select id="difficultySelect" aria-label="Dificuldade dos bots">
+                  <option value="calm">Tranquila</option>
+                  <option value="normal">Normal</option>
+                  <option value="intense">Intensa</option>
+                </select>
               </label>
             </div>
           </section>
+
+          <details class="menu-summary-card">
+            <summary class="menu-summary-card__summary menu-summary-card__summary--progress">
+              <span class="menu-summary-card__icon" aria-hidden="true"><img src="./assets/ui/icon-progress.svg" alt=""></span>
+              <span class="menu-summary-card__text">
+                <strong>Progresso</strong>
+                <small>Acompanhe sua jornada</small>
+              </span>
+              <span class="menu-summary-card__arrow" aria-hidden="true">›</span>
+            </summary>
+
+            <div class="menu-summary-card__content menu-progress-panel">
+              <div class="selected-skin-line">
+                <span>Skin atual</span>
+                <strong id="selectedSkinMenuValue">Menta Neon</strong>
+              </div>
+
+              <div class="menu-wallet">
+                <span>
+                  <small>Saldo</small>
+                  <strong>🪙 <span id="coinBalanceMenuValue">180</span></strong>
+                </span>
+                <button id="openDailySummaryButton" type="button">
+                  <small>Missões do dia</small>
+                  <strong id="dailySummaryValue">0/3</strong>
+                </button>
+              </div>
+
+              <button id="openProfileSummaryButton" class="profile-summary-button" type="button">
+                <span class="profile-summary-button__level">
+                  <small>Nível</small>
+                  <strong id="profileLevelMenuValue">1</strong>
+                </span>
+                <span>
+                  <small id="profileTitleMenuValue">Novato da Arena</small>
+                  <strong id="profileXpMenuValue">0/105 XP</strong>
+                </span>
+                <span class="profile-summary-button__arrow" aria-hidden="true">›</span>
+              </button>
+
+              <div class="season-menu-summary">
+                <button id="openSeasonSummaryButton" type="button">
+                  <small>Temporada</small>
+                  <strong id="seasonMenuValue">Nível 1/20</strong>
+                </button>
+                <button id="openWeeklySummaryButton" type="button">
+                  <small>Evento semanal</small>
+                  <strong id="weeklyMenuValue">0/3</strong>
+                </button>
+              </div>
+
+              <button id="openCompetitiveSummaryButton" class="competitive-summary-button" type="button">
+                <span id="competitiveLeagueIconMenu">🥉</span>
+                <span>
+                  <small id="competitiveLeagueMenuValue">Bronze</small>
+                  <strong><span id="competitiveRatingMenuValue">1000</span> pontos</strong>
+                </span>
+                <span class="competitive-summary-button__streak">🔥 <strong id="streakMenuValue">0</strong></span>
+              </button>
+
+              <div class="menu-subactions-grid menu-subactions-grid--progress">
+                <button id="openCompetitiveButton" class="menu-tool-button menu-tool-button--competitive" type="button"><span>🏆</span> Competitivo</button>
+                <button id="openProfileButton" class="menu-tool-button menu-tool-button--profile" type="button"><span>👤</span> Perfil</button>
+                <button id="openDailyButton" class="menu-tool-button menu-tool-button--daily" type="button"><span>📅</span> Missões</button>
+                <button id="openSeasonButton" class="menu-tool-button menu-tool-button--season" type="button"><span>🌀</span> Temporada</button>
+                <button id="openWeeklyButton" class="menu-tool-button menu-tool-button--weekly" type="button"><span>🎪</span> Evento</button>
+                <button id="openHistoryButton" class="menu-tool-button menu-tool-button--history" type="button"><span>📜</span> Histórico</button>
+                <button id="openStatsButton" class="menu-tool-button" type="button"><span>📊</span> Recordes</button>
+                <button id="openAchievementsButton" class="menu-tool-button" type="button"><span>🏅</span> Conquistas</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="menu-summary-card">
+            <summary class="menu-summary-card__summary menu-summary-card__summary--customize">
+              <span class="menu-summary-card__icon" aria-hidden="true"><img src="./assets/ui/icon-customize.svg" alt=""></span>
+              <span class="menu-summary-card__text">
+                <strong>Personalizar</strong>
+                <small>Deixe sua cobra única</small>
+              </span>
+              <span class="menu-summary-card__arrow" aria-hidden="true">›</span>
+            </summary>
+
+            <div class="menu-summary-card__content">
+              <div class="menu-subactions-grid menu-subactions-grid--two">
+                <button id="openSkinsButton" class="menu-tool-button" type="button"><span>🎨</span> Skins</button>
+                <button id="openShopButton" class="menu-tool-button menu-tool-button--shop" type="button"><span>🛍️</span> Loja</button>
+              </div>
+            </div>
+          </details>
+
+          <details class="menu-summary-card">
+            <summary class="menu-summary-card__summary menu-summary-card__summary--system">
+              <span class="menu-summary-card__icon" aria-hidden="true"><img src="./assets/ui/icon-system.svg" alt=""></span>
+              <span class="menu-summary-card__text">
+                <strong>Sistema</strong>
+                <small>Ajustes e preferências</small>
+              </span>
+              <span class="menu-summary-card__arrow" aria-hidden="true">›</span>
+            </summary>
+
+            <div class="menu-summary-card__content">
+              <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
+                <span id="onlineSummaryIcon">☁️</span>
+                <span>
+                  <small id="onlineSummaryLabel">Modo local</small>
+                  <strong id="onlineSummaryValue">Conectar conta</strong>
+                </span>
+                <span id="onlineSummaryState" class="online-summary-button__state">Offline seguro</span>
+              </button>
+
+              <div class="menu-subactions-grid menu-subactions-grid--system">
+                <button id="openOnlineButton" class="menu-tool-button menu-tool-button--online" type="button"><span>☁️</span> Online</button>
+                <button id="openDataButton" class="menu-tool-button menu-tool-button--data" type="button"><span>💾</span> Dados</button>
+                <button id="openSettingsButton" class="menu-tool-button" type="button"><span>⚙️</span> Configurações</button>
+                <button id="menuFullscreenButton" class="menu-tool-button" type="button"><span>⛶</span> Tela cheia</button>
+                <button id="installAppButton" class="menu-tool-button menu-tool-button--accent pwa-install-hidden" type="button"><span>⬇️</span> Instalar app</button>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
 
           <details class="menu-accordion" open>
             <summary class="menu-accordion__summary menu-accordion__summary--progress">

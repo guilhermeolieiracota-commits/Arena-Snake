@@ -1,4 +1,4 @@
-const CACHE_NAME = "snake-arena-v15-3";
+const CACHE_NAME = "snake-arena-v15-4";
 
 const APP_SHELL = [
   "./",
@@ -98,7 +98,14 @@ const APP_SHELL = [
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",
   "./assets/icons/icon-maskable-512.png",
-  "./assets/icons/icon.svg"
+  "./assets/icons/icon.svg",
+  "./assets/ui/menu-hero-fase-15-4.png",
+  "./assets/ui/icon-touch.svg",
+  "./assets/ui/icon-display.svg",
+  "./assets/ui/icon-bot.svg",
+  "./assets/ui/icon-progress.svg",
+  "./assets/ui/icon-customize.svg",
+  "./assets/ui/icon-system.svg"
 ];
 
 const toScopeUrl = (path) =>
