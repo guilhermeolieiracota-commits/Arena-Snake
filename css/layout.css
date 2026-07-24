@@ -15,7 +15,8 @@ body {
   z-index: 20;
   inset: 0;
   display: none;
-  place-items: center;
+  justify-items: center;
+  align-items: start;
   padding:
     max(24px, env(safe-area-inset-top))
     max(18px, env(safe-area-inset-right))
@@ -23,8 +24,9 @@ body {
     max(18px, env(safe-area-inset-left));
   overflow-y: auto;
   background:
-    radial-gradient(circle at 50% 35%, rgba(48, 132, 178, 0.18), transparent 38%),
-    rgba(2, 7, 15, 0.48);
+    radial-gradient(circle at 18% 24%, rgba(43, 239, 213, 0.08), transparent 24%),
+    radial-gradient(circle at 85% 12%, rgba(45, 186, 255, 0.09), transparent 18%),
+    linear-gradient(180deg, rgba(4, 14, 26, 0.96), rgba(3, 10, 19, 0.985));
   backdrop-filter: blur(8px);
 }
 

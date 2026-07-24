@@ -3812,3 +3812,83 @@ body.gameplay-active #installBanner {
   padding: 4px;
   box-sizing: border-box;
 }
+
+/* Fase 15.4.2 — topo integrado e botão fiel ao mockup */
+body,
+.app-shell {
+  background:
+    radial-gradient(circle at 18% 25%, rgba(50, 245, 215, 0.09), transparent 24%),
+    radial-gradient(circle at 86% 12%, rgba(0, 170, 255, 0.08), transparent 18%),
+    linear-gradient(180deg, #04111f 0%, #04101d 100%);
+}
+
+.panel--menu-fidelity {
+  background:
+    radial-gradient(circle at left center, rgba(53, 246, 211, 0.09), rgba(53,246,211,0) 22%),
+    linear-gradient(180deg, rgba(6, 18, 32, 0.97), rgba(4, 12, 24, 0.99));
+}
+
+.menu-fidelity__banner {
+  background: #061320;
+  border: 1px solid rgba(58, 155, 190, 0.1);
+  box-shadow: none;
+}
+
+.menu-fidelity__banner img {
+  display: block;
+  width: 100%;
+  max-height: min(34vw, 336px);
+  height: auto;
+  object-fit: contain;
+  background: #061320;
+}
+
+.menu-fidelity__start {
+  min-height: 112px;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: center;
+  justify-content: start;
+  padding: 10px 30px;
+  border-radius: 28px;
+  border: 1px solid rgba(58, 181, 226, 0.95);
+  background: linear-gradient(90deg, #42efcf 0%, #35dbe3 43%, #2aa8ff 100%);
+  box-shadow:
+    0 0 0 2px rgba(5, 22, 38, 0.9),
+    inset 0 0 0 2px rgba(92, 255, 235, 0.5),
+    0 0 24px rgba(39, 185, 255, 0.28);
+  color: #020f1c;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: clamp(1.8rem, 2.8vw, 2.35rem);
+  font-weight: 900;
+}
+
+.menu-fidelity__start:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.menu-fidelity__start span:last-child {
+  display: block;
+  text-align: left;
+  font-weight: 900;
+  color: #03111f;
+}
+
+.menu-fidelity__start-icon {
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 0;
+}
+
+.menu-fidelity__start-icon img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
+}

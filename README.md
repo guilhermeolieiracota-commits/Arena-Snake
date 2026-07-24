@@ -1,4 +1,4 @@
-# Snake Arena — Fase 15.4.1 Final
+# Snake Arena — Fase 15.4.2 Final
 
 Esta versão foi construída sobre a Fase 15.3, sem recriar o projeto do zero.
 
@@ -148,3 +148,8 @@ A próxima fase pode adicionar:
 - desafios entre jogadores;
 - notificações sociais;
 - temporadas globais administradas pelo Supabase.
+
+- botão principal redesenhado para ficar fiel ao mockup.
+- tela inicial agora começa pelo topo no mobile (sem cortar o banner).
+- fundo geral da Home ajustado para combinar com o fundo do banner.
+- banner integrado visualmente ao layout para não parecer imagem colada.
