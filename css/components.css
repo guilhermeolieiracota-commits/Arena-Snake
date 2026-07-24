@@ -3094,3 +3094,19 @@ h2 {
 .helper {
   margin-top: 0;
 }
+
+/* Fase 15.1 — segurança contra popups persistentes */
+[hidden] {
+  display: none !important;
+}
+
+#updateBanner {
+  display: none !important;
+}
+
+body.gameplay-active #rewardToast,
+body.gameplay-active #achievementToast,
+body.gameplay-active #updateBanner,
+body.gameplay-active #installBanner {
+  display: none !important;
+}

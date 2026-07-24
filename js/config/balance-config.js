@@ -55,6 +55,7 @@ export const BALANCE_CONFIG = Object.freeze({
   }),
 
   collision: Object.freeze({
+    rivalDiesOnPlayerBody: true,
     spatialCellSize: 180,
     headBodyHeadScale: 0.76,
     headBodySegmentScale: 0.70,

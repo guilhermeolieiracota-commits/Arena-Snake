@@ -233,6 +233,22 @@ export class CollisionSystem {
           continue;
         }
 
+        if (
+          BALANCE_CONFIG.collision
+            .rivalDiesOnPlayerBody &&
+          prey.isPlayer &&
+          !snake.isPlayer
+        ) {
+          this.addDeath(deaths, {
+            kind: "death",
+            victim: snake,
+            killer: prey,
+            reason: CollisionReason.BODY,
+            awardElimination: true,
+          });
+          break;
+        }
+
         if (this.canPredate(snake, prey)) {
           if (
             bitingPredators.has(snake.id) ||

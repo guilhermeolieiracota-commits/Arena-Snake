@@ -518,7 +518,7 @@ for (
 }
 
 document.title =
-  `${GAME_CONFIG.name} — Fase 14 Mobile`;
+  `${GAME_CONFIG.name} — Fase 15.2`;
 
 const storageService =
   new StorageService();
@@ -732,12 +732,29 @@ const setGameInterfaceVisibility = (
 
   elements.killFeed.hidden = !visible;
 
-  if (
-    visible &&
-    !elements.updateBanner.hidden
-  ) {
-    pendingUpdateBanner = true;
-    hideUpdateBanner();
+  if (visible) {
+    window.clearTimeout(
+      toastQueueTimer
+    );
+
+    window.clearTimeout(
+      rewardToastTimer
+    );
+
+    window.clearTimeout(
+      achievementToastTimer
+    );
+
+    toastQueue.length = 0;
+    toastQueueActive = false;
+    elements.rewardToast.hidden = true;
+    elements.achievementToast.hidden = true;
+
+    if (!elements.updateBanner.hidden) {
+      hideUpdateBanner({
+        clearPending: true,
+      });
+    }
   }
 
   document.body.classList.toggle(
@@ -1481,13 +1498,34 @@ const updateCoinBalance = (
     value;
 };
 
-const isZeroValueReward = (name) =>
-  /^\+?0(?:[.,]0+)?\s*(?:moedas?|xp|pontos?)$/i.test(
-    String(name ?? "").trim()
+const isZeroValueReward = (name) => {
+  const normalized = String(
+    name ?? ""
+  ).trim();
+
+  const numericValues = Array.from(
+    normalized.matchAll(
+      /-?\d+(?:[.,]\d+)?/g
+    ),
+    (match) =>
+      Number(
+        match[0].replace(",", ".")
+      )
+  ).filter(Number.isFinite);
+
+  return (
+    numericValues.length > 0 &&
+    numericValues.every(
+      (value) => value <= 0
+    )
   );
+};
 
 const processToastQueue = () => {
   if (
+    document.body.classList.contains(
+      "gameplay-active"
+    ) ||
     toastQueueActive ||
     toastQueue.length === 0
   ) {
@@ -1538,7 +1576,23 @@ const processToastQueue = () => {
 };
 
 const enqueueToast = (toast) => {
+  if (
+    document.body.classList.contains(
+      "gameplay-active"
+    )
+  ) {
+    return;
+  }
+
   toastQueue.push(toast);
+
+  if (toastQueue.length > 3) {
+    toastQueue.splice(
+      0,
+      toastQueue.length - 3
+    );
+  }
+
   processToastQueue();
 };
 
@@ -1859,12 +1913,14 @@ const showLevelUpToast = ({
   updateProgressionUi();
   renderProfileScreen();
 
-  showRewardToast({
-    icon: "⬆️",
-    label: `Nível ${level} alcançado`,
-    name: `+${reward.coins} moedas`,
-    sound: "levelUp",
-  });
+  if ((Number(reward.coins) || 0) > 0) {
+    showRewardToast({
+      icon: "⬆️",
+      label: `Nível ${level} alcançado`,
+      name: `+${reward.coins} moedas`,
+      sound: "levelUp",
+    });
+  }
 };
 
 const showTitleUnlockedToast = (
@@ -2120,6 +2176,10 @@ const showDailyActivityToast = ({
 }) => {
   updateCoinBalance();
   updateStreakUi();
+
+  if ((Number(amount) || 0) <= 0) {
+    return;
+  }
 
   showRewardToast({
     icon: "🔥",
@@ -4643,8 +4703,7 @@ pwaManager =
     onInstallAvailabilityChange:
       setInstallAvailability,
 
-    onUpdateAvailable:
-      showUpdateAvailable,
+    onUpdateAvailable: null,
 
     onNetworkChange:
       setNetworkStatus,

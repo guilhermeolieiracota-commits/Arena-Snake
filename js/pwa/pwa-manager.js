@@ -101,7 +101,9 @@ export class PwaManager {
       registration.waiting &&
       navigator.serviceWorker.controller
     ) {
-      this.onUpdateAvailable?.();
+      registration.waiting.postMessage({
+        type: "SKIP_WAITING",
+      });
     }
 
     registration.addEventListener(
@@ -122,7 +124,9 @@ export class PwaManager {
               navigator.serviceWorker
                 .controller
             ) {
-              this.onUpdateAvailable?.();
+              worker.postMessage({
+                type: "SKIP_WAITING",
+              });
             }
           }
         );
