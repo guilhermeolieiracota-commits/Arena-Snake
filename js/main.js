@@ -518,7 +518,7 @@ for (
 }
 
 document.title =
-  `${GAME_CONFIG.name} — Fase 13 Final`;
+  `${GAME_CONFIG.name} — Fase 14 Mobile`;
 
 const storageService =
   new StorageService();
@@ -567,6 +567,7 @@ let loadingFinished = false;
 let achievementToastTimer = null;
 let rewardToastTimer = null;
 let toastQueueTimer = null;
+let updateBannerTimer = null;
 let toastQueueActive = false;
 const toastQueue = [];
 let lastAchievementEvaluationTime = -Infinity;
@@ -2765,9 +2766,36 @@ const setNetworkStatus = (
   renderOnlineState();
 };
 
+const hideUpdateBanner = () => {
+  window.clearTimeout(
+    updateBannerTimer
+  );
+
+  elements.updateBanner.classList.remove(
+    "action-banner--temporary-visible"
+  );
+
+  elements.updateBanner.hidden =
+    true;
+};
+
 const showUpdateAvailable = () => {
+  window.clearTimeout(
+    updateBannerTimer
+  );
+
   elements.updateBanner.hidden =
     false;
+
+  elements.updateBanner.classList.add(
+    "action-banner--temporary-visible"
+  );
+
+  updateBannerTimer =
+    window.setTimeout(
+      hideUpdateBanner,
+      6500
+    );
 };
 
 const runInstallPrompt = async () => {
@@ -4491,16 +4519,17 @@ elements.installDismissButton.addEventListener(
 elements.updateNowButton.addEventListener(
   "click",
   () => {
+    window.clearTimeout(
+      updateBannerTimer
+    );
+
     pwaManager.applyUpdate();
   }
 );
 
 elements.updateDismissButton.addEventListener(
   "click",
-  () => {
-    elements.updateBanner.hidden =
-      true;
-  }
+  hideUpdateBanner
 );
 
 document.addEventListener(

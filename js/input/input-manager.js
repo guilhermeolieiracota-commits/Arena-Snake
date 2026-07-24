@@ -28,7 +28,8 @@ export class InputManager {
     this.keyboard = new KeyboardInput();
     this.joystick = new VirtualJoystick(
       joystickRoot,
-      joystickKnob
+      joystickKnob,
+      canvas
     );
 
     this.handlePointerMove = this.handlePointerMove.bind(this);

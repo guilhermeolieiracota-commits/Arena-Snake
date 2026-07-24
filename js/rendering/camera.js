@@ -50,11 +50,27 @@ export class Camera {
         GRAPHICS_CONFIG.minZoom) *
         sizeFactor;
 
-    this.targetZoom =
+    const boostZoom =
       sizeZoom -
       BALANCE_CONFIG.boost
         .cameraZoomReduction *
         clamp(boostIntensity, 0, 1);
+
+    const mobileViewport =
+      window.matchMedia?.(
+        "(max-width: 720px)"
+      ).matches;
+
+    this.targetZoom =
+      mobileViewport
+        ? Math.max(
+            GRAPHICS_CONFIG
+              .mobileMinimumZoom,
+            boostZoom *
+              GRAPHICS_CONFIG
+                .mobileZoomMultiplier
+          )
+        : boostZoom;
 
     this.zoom = exponentialSmoothing(
       this.zoom,

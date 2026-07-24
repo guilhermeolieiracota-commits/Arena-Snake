@@ -683,7 +683,6 @@
     height: 28px;
   }
 
-  body.gameplay-active .action-banner--update,
   body.gameplay-active #installBanner {
     display: none !important;
   }
@@ -788,5 +787,127 @@
   body.gameplay-active #minimapCanvas {
     width: 68px;
     height: 68px;
+  }
+}
+
+
+/* Fase 14.1 — joystick no toque, aviso temporário e HUD móvel mais limpo */
+@media (max-width: 720px) {
+  body.gameplay-active .joystick,
+  body.gameplay-active .joystick.joystick--visible {
+    position: fixed !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 112px;
+    height: 112px;
+    margin: 0;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+
+  body.gameplay-active .joystick__knob {
+    width: 48px;
+    height: 48px;
+  }
+
+  body.gameplay-active .action-banner--update:not([hidden]) {
+    position: fixed;
+    z-index: 64;
+    top: max(
+      88px,
+      calc(env(safe-area-inset-top) + 78px)
+    );
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    display: grid !important;
+    width: min(318px, calc(100% - 24px));
+    min-height: 48px;
+    padding: 7px 9px;
+    border-radius: 12px;
+    transform: translateX(-50%);
+    animation: mobileUpdateBannerIn 180ms ease-out;
+  }
+
+  body.gameplay-active .action-banner--update small {
+    display: none;
+  }
+
+  body.gameplay-active .action-banner--update strong {
+    font-size: 0.76rem;
+  }
+
+  body.gameplay-active .action-banner--update
+    > button:not(.action-banner__close) {
+    padding: 7px 9px;
+    font-size: 0.72rem;
+  }
+
+  body.gameplay-active .action-banner--update
+    .action-banner__close {
+    top: -8px;
+    right: -5px;
+    width: 25px;
+    height: 25px;
+  }
+
+  @keyframes mobileUpdateBannerIn {
+    from {
+      opacity: 0;
+      transform:
+        translate(-50%, -8px)
+        scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform:
+        translate(-50%, 0)
+        scale(1);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  body.gameplay-active .leaderboard,
+  body.gameplay-active .leaderboard.leaderboard--visible {
+    inset:
+      auto auto
+      max(
+        132px,
+        calc(env(safe-area-inset-bottom) + 122px)
+      )
+      8px !important;
+    width: 112px;
+    max-width: 112px;
+    z-index: 18;
+  }
+
+  body.gameplay-active .minimap,
+  body.gameplay-active .minimap.minimap--visible {
+    inset:
+      auto 8px
+      max(
+        132px,
+        calc(env(safe-area-inset-bottom) + 122px)
+      )
+      auto !important;
+    width: 76px;
+    max-width: 76px;
+    z-index: 18;
+  }
+
+  body.gameplay-active #minimapCanvas {
+    width: 62px;
+    height: 62px;
+  }
+
+  body.gameplay-active .leaderboard__item {
+    grid-template-columns:
+      14px 6px 1fr;
+  }
+
+  body.gameplay-active .leaderboard__score {
+    display: none;
   }
 }

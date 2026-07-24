@@ -43,6 +43,8 @@ export const GRAPHICS_CONFIG = Object.freeze({
   worldGridSize: 90,
   minZoom: 0.66,
   maxZoom: 1.08,
+  mobileZoomMultiplier: 0.76,
+  mobileMinimumZoom: 0.48,
   cameraFollowSpeed: 7,
   zoomFollowSpeed: 4,
   arenaFill: "#0a1728",
