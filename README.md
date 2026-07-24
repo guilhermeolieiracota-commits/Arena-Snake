@@ -1,6 +1,22 @@
-# Snake Arena — Fase 13 Final
+# Snake Arena — Fase 14 Final
 
 Esta versão foi construída diretamente sobre a Fase 12 configurada. Nenhum sistema anterior foi recriado ou removido.
+
+## Novidades da Fase 14
+
+Esta fase foi aplicada sobre a Fase 13 já configurada. O layout de computador foi preservado.
+
+- interface mobile compacta e adaptada à área segura do celular;
+- notificações exibidas em fila, sem sobreposição;
+- recompensas de valor zero ocultadas;
+- ranking, radar, joystick e turbo reposicionados;
+- borda vermelha sem morte, com repulsão para dentro da arena;
+- cobras maiores podem consumir segmentos das menores;
+- crescimento e pontuação por segmento consumido;
+- cache PWA atualizado para `snake-arena-v14-1`.
+
+Detalhes completos: `ALTERACOES-FASE-14.md`.
+
 
 ## Novos recursos
 

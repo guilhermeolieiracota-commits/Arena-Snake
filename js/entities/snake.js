@@ -132,6 +132,8 @@ export class Snake {
     this.x += Math.cos(this.angle) * this.speed * delta;
     this.y += Math.sin(this.angle) * this.speed * delta;
 
+    this.resolveArenaBoundary();
+
     this.samplePath(previousX, previousY, this.x, this.y);
     this.trimPath();
     this.rebuildSegmentPositions();
@@ -145,6 +147,62 @@ export class Snake {
     this.recalculateGrowthTargets();
   }
 
+  addPredationSegment({ scoreValue, massValue }) {
+    this.score += Math.max(0, Number(scoreValue) || 0);
+    this.mass += Math.max(0, Number(massValue) || 0);
+    this.maximumMass = Math.max(this.maximumMass, this.mass);
+    this.recalculateGrowthTargets();
+  }
+
+  canLosePredationSegment() {
+    return (
+      this.segmentCount >
+        BALANCE_CONFIG.predation.minimumVictimSegments &&
+      this.mass >
+        BALANCE_CONFIG.predation.minimumVictimMass
+    );
+  }
+
+  consumePredationSegment() {
+    if (!this.canLosePredationSegment()) {
+      return null;
+    }
+
+    const removedPosition =
+      this.segmentPositions.at(-1) ?? {
+        x: this.x,
+        y: this.y,
+      };
+
+    this.mass = Math.max(
+      BALANCE_CONFIG.predation.minimumVictimMass,
+      this.mass -
+        BALANCE_CONFIG.predation.victimMassLossPerBite
+    );
+
+    this.segmentCount = Math.max(
+      BALANCE_CONFIG.predation.minimumVictimSegments,
+      this.segmentCount - 1
+    );
+
+    this.recalculateGrowthTargets();
+    this.targetSegmentCount = Math.min(
+      this.targetSegmentCount,
+      this.segmentCount
+    );
+
+    this.trimPath();
+    this.rebuildSegmentPositions();
+
+    return {
+      x: removedPosition.x,
+      y: removedPosition.y,
+      radius: Math.max(3.5, this.radius * 0.72),
+      color: this.primaryColor,
+      secondaryColor: this.secondaryColor,
+    };
+  }
+
   removeMass(amount) {
     const safeAmount = Math.max(0, Number(amount) || 0);
     this.mass = Math.max(1, this.mass - safeAmount);
@@ -152,14 +210,29 @@ export class Snake {
   }
 
   recalculateGrowthTargets() {
-    const gainedMass = Math.max(
-      0,
-      this.mass - BALANCE_CONFIG.initialPlayerMass
-    );
+    const massDifference =
+      this.mass - BALANCE_CONFIG.initialPlayerMass;
 
-    this.targetSegmentCount =
-      BALANCE_CONFIG.initialSegments +
-      Math.floor(gainedMass / BALANCE_CONFIG.massPerSegment);
+    if (massDifference >= 0) {
+      this.targetSegmentCount =
+        BALANCE_CONFIG.initialSegments +
+        Math.floor(
+          massDifference /
+            BALANCE_CONFIG.massPerSegment
+        );
+    } else {
+      this.targetSegmentCount = Math.max(
+        BALANCE_CONFIG.predation.minimumVictimSegments,
+        BALANCE_CONFIG.initialSegments -
+          Math.ceil(
+            Math.abs(massDifference) /
+              BALANCE_CONFIG.predation
+                .victimMassLossPerBite
+          )
+      );
+    }
+
+    const gainedMass = Math.max(0, massDifference);
 
     const radiusProgress = clamp(
       gainedMass /
@@ -172,11 +245,32 @@ export class Snake {
       1
     );
 
-    this.targetRadius =
-      BALANCE_CONFIG.snakeBaseRadius +
-      (BALANCE_CONFIG.snakeMaximumRadius -
-        BALANCE_CONFIG.snakeBaseRadius) *
-        Math.sqrt(radiusProgress);
+    if (massDifference < 0) {
+      const depletionProgress = clamp(
+        Math.abs(massDifference) /
+          Math.max(
+            BALANCE_CONFIG.initialPlayerMass -
+              BALANCE_CONFIG.predation.minimumVictimMass,
+            1
+          ),
+        0,
+        1
+      );
+
+      this.targetRadius =
+        BALANCE_CONFIG.snakeBaseRadius *
+        (1 -
+          depletionProgress *
+            (1 -
+              BALANCE_CONFIG.predation
+                .minimumVictimRadiusFactor));
+    } else {
+      this.targetRadius =
+        BALANCE_CONFIG.snakeBaseRadius +
+        (BALANCE_CONFIG.snakeMaximumRadius -
+          BALANCE_CONFIG.snakeBaseRadius) *
+          Math.sqrt(radiusProgress);
+    }
   }
 
   updateGrowth(delta) {
@@ -241,6 +335,75 @@ export class Snake {
       this.boostIntensity > 0.05 ? 8.5 : 4.5,
       delta
     );
+  }
+
+  resolveArenaBoundary() {
+    const maximumDistance = Math.max(
+      1,
+      BALANCE_CONFIG.worldRadius -
+        BALANCE_CONFIG.boundaryHardPadding -
+        this.radius
+    );
+
+    const distanceFromCenter = Math.hypot(
+      this.x,
+      this.y
+    );
+
+    if (
+      !Number.isFinite(distanceFromCenter) ||
+      distanceFromCenter <= maximumDistance
+    ) {
+      return false;
+    }
+
+    const normalX = this.x / distanceFromCenter;
+    const normalY = this.y / distanceFromCenter;
+
+    this.x = normalX * maximumDistance;
+    this.y = normalY * maximumDistance;
+
+    const velocityX = Math.cos(this.angle);
+    const velocityY = Math.sin(this.angle);
+    const outwardSpeed =
+      velocityX * normalX +
+      velocityY * normalY;
+
+    let reflectedX = velocityX;
+    let reflectedY = velocityY;
+
+    if (outwardSpeed > 0) {
+      reflectedX =
+        velocityX -
+        2 * outwardSpeed * normalX;
+      reflectedY =
+        velocityY -
+        2 * outwardSpeed * normalY;
+    }
+
+    reflectedX -= normalX * 0.22;
+    reflectedY -= normalY * 0.22;
+
+    const reflectedLength = Math.hypot(
+      reflectedX,
+      reflectedY
+    );
+
+    if (reflectedLength > 0.0001) {
+      this.angle = Math.atan2(
+        reflectedY,
+        reflectedX
+      );
+      this.targetAngle = this.angle;
+    } else {
+      this.angle = Math.atan2(
+        -normalY,
+        -normalX
+      );
+      this.targetAngle = this.angle;
+    }
+
+    return true;
   }
 
   reset({

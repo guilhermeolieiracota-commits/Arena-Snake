@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Snake Arena",
   "short_name": "Snake Arena",
-  "description": "Jogo de arena com perfil público, ranking global avançado, partidas da comunidade, recuperação de conta, nuvem e modo offline.",
+  "description": "Jogo de arena com modo offline, layout mobile otimizado, bordas seguras e cobras maiores capazes de consumir segmentos das menores.",
   "lang": "pt-BR",
   "dir": "ltr",
   "start_url": "./?source=pwa",

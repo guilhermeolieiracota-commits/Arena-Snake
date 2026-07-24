@@ -62,6 +62,11 @@ const requiredFiles = [
   "tools/test-phase11.mjs",
   "tools/test-phase12.mjs",
   "tools/test-phase13.mjs",
+  "js/systems/predation-system.js",
+  "tools/test-phase14.mjs",
+  "ALTERACOES-FASE-14.md",
+  "tests/fase-14-checklist.md",
+  "tests/validation-report-fase-14.md",
 ];
 
 for (const file of requiredFiles) {

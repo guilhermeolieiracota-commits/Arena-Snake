@@ -84,9 +84,16 @@ export class DeathSystem {
           : `${victimName} perdeu no choque de cabeças`;
         break;
 
+      case CollisionReason.PREDATION:
+        text = `${killerName ?? "Uma cobra"} devorou ${victimName}`;
+        break;
+
       case CollisionReason.BORDER:
+        text = `${victimName} foi repelido pela borda`;
+        break;
+
       default:
-        text = `${victimName} bateu na borda`;
+        text = `${victimName} foi eliminado`;
         break;
     }
 

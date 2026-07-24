@@ -536,3 +536,257 @@
     grid-column: 1 / -1;
   }
 }
+
+/* Fase 14 — correção mobile sem alterar o layout de desktop */
+@media (max-width: 720px) {
+  body.gameplay-active .game-hud.game-hud--visible {
+    top: max(6px, env(safe-area-inset-top));
+    right: max(8px, env(safe-area-inset-right));
+    left: max(8px, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 5px;
+  }
+
+  body.gameplay-active .game-hud .hud-card {
+    min-width: 0;
+    padding: 6px 7px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  body.gameplay-active .game-hud .hud-label {
+    margin-bottom: 1px;
+    font-size: 0.56rem;
+    white-space: nowrap;
+  }
+
+  body.gameplay-active .game-hud .hud-card strong {
+    display: block;
+    overflow: hidden;
+    font-size: 0.82rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body.gameplay-active .hud-card--player,
+  body.gameplay-active .hud-card--kills,
+  body.gameplay-active .hud-card--coins,
+  body.gameplay-active .hud-card--level,
+  body.gameplay-active .hud-card--league,
+  body.gameplay-active .hud-card--protection {
+    display: none !important;
+  }
+
+  body.gameplay-active .hud-card--score,
+  body.gameplay-active .game-hud > .hud-card:nth-child(3),
+  body.gameplay-active .hud-card--rank {
+    grid-column: span 2;
+  }
+
+  body.gameplay-active .hud-card--boost {
+    grid-column: span 3;
+    min-width: 0;
+  }
+
+  body.gameplay-active .game-hud .icon-button {
+    grid-column: span 1;
+    width: 100%;
+    min-width: 0;
+    height: 38px;
+    flex-basis: auto;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 0.96rem;
+  }
+
+  body.gameplay-active #audioToggleButton {
+    margin-left: 0;
+  }
+
+  body.gameplay-active #fullscreenHudButton {
+    display: none !important;
+  }
+
+  .achievement-toast,
+  .reward-toast {
+    top: max(10px, env(safe-area-inset-top));
+    right: 10px;
+    left: 10px;
+    grid-template-columns: 40px 1fr;
+    gap: 9px;
+    width: auto;
+    min-height: 58px;
+    padding: 8px 10px;
+    border-radius: 13px;
+  }
+
+  body.gameplay-active .achievement-toast,
+  body.gameplay-active .reward-toast {
+    top: max(94px, calc(env(safe-area-inset-top) + 88px));
+  }
+
+  .achievement-toast > span,
+  .reward-toast > span {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    font-size: 1.12rem;
+  }
+
+  .achievement-toast small,
+  .reward-toast small {
+    font-size: 0.56rem;
+    line-height: 1.2;
+  }
+
+  .achievement-toast strong,
+  .reward-toast strong {
+    font-size: 0.90rem;
+    line-height: 1.22;
+  }
+
+  .action-banner {
+    right: 10px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 10px;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    width: auto;
+    min-height: 56px;
+    padding: 8px 10px;
+    border-radius: 13px;
+  }
+
+  .action-banner span {
+    gap: 0;
+  }
+
+  .action-banner strong {
+    font-size: 0.83rem;
+  }
+
+  .action-banner small {
+    display: none;
+  }
+
+  .action-banner > button:not(.action-banner__close) {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+
+  .action-banner__close {
+    position: absolute;
+    top: -9px;
+    right: -4px;
+    width: 28px;
+    height: 28px;
+  }
+
+  body.gameplay-active .action-banner--update,
+  body.gameplay-active #installBanner {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.gameplay-active .joystick {
+    left: max(14px, env(safe-area-inset-left));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: 108px;
+    height: 108px;
+  }
+
+  body.gameplay-active .joystick__knob {
+    width: 48px;
+    height: 48px;
+  }
+
+  body.gameplay-active .boost-button {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    width: 74px;
+    height: 74px;
+  }
+
+  body.gameplay-active .boost-button span {
+    font-size: 1.42rem;
+  }
+
+  body.gameplay-active .boost-button small {
+    margin-top: -6px;
+    font-size: 0.57rem;
+  }
+
+  body.gameplay-active .leaderboard,
+  body.gameplay-active .leaderboard.leaderboard--visible {
+    top: auto;
+    right: auto;
+    bottom: max(148px, calc(env(safe-area-inset-bottom) + 136px));
+    left: 10px;
+    display: block !important;
+    width: 132px;
+    padding: 7px;
+    border-radius: 13px;
+  }
+
+  body.gameplay-active .leaderboard__title {
+    margin-bottom: 5px;
+  }
+
+  body.gameplay-active .leaderboard__title span {
+    font-size: 0.76rem;
+  }
+
+  body.gameplay-active .leaderboard__title small {
+    font-size: 0.56rem;
+  }
+
+  body.gameplay-active .leaderboard__item {
+    grid-template-columns: 15px 7px 1fr auto;
+    gap: 4px;
+    padding: 3px 4px;
+    font-size: 0.60rem;
+  }
+
+  body.gameplay-active .leaderboard__item:nth-child(n + 4) {
+    display: none;
+  }
+
+  body.gameplay-active .minimap {
+    right: 10px;
+    bottom: max(148px, calc(env(safe-area-inset-bottom) + 136px));
+    width: 88px;
+    padding: 6px;
+    border-radius: 13px;
+  }
+
+  body.gameplay-active #minimapCanvas {
+    width: 74px;
+    height: 74px;
+  }
+
+  body.gameplay-active .minimap__title {
+    font-size: 0.55rem;
+  }
+
+  body.gameplay-active .kill-feed {
+    display: none !important;
+  }
+}
+
+@media (max-width: 390px) {
+  body.gameplay-active .leaderboard,
+  body.gameplay-active .leaderboard.leaderboard--visible {
+    width: 122px;
+  }
+
+  body.gameplay-active .minimap {
+    width: 82px;
+  }
+
+  body.gameplay-active #minimapCanvas {
+    width: 68px;
+    height: 68px;
+  }
+}

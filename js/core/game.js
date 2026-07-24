@@ -13,6 +13,7 @@ import { CollisionSystem } from "../systems/collision-system.js";
 import { DeathSystem } from "../systems/death-system.js";
 import { FoodSystem } from "../systems/food-system.js";
 import { ParticleSystem } from "../systems/particle-system.js";
+import { PredationSystem } from "../systems/predation-system.js";
 import { RankingSystem } from "../systems/ranking-system.js";
 import { clamp } from "../utils/math.js";
 
@@ -86,6 +87,8 @@ export class Game {
     this.boostSystem = new BoostSystem();
     this.collisionSystem =
       new CollisionSystem();
+    this.predationSystem =
+      new PredationSystem();
     this.deathSystem = new DeathSystem();
     this.rankingSystem =
       new RankingSystem();
@@ -129,6 +132,8 @@ export class Game {
     this.createPlayer();
     this.foodSystem.reset();
     this.boostSystem.reset();
+    this.collisionSystem.reset();
+    this.predationSystem.reset();
     this.rankingSystem.reset();
     this.deathSystem.reset();
 
@@ -230,6 +235,8 @@ export class Game {
     this.foodSystem.reset();
     this.particleSystem.reset();
     this.boostSystem.reset();
+    this.collisionSystem.reset();
+    this.predationSystem.reset();
     this.deathSystem.reset();
     this.rankingSystem.reset();
 
@@ -283,6 +290,8 @@ export class Game {
     this.foodSystem.reset();
     this.particleSystem.reset();
     this.boostSystem.reset();
+    this.collisionSystem.reset();
+    this.predationSystem.reset();
     this.deathSystem.reset();
     this.rankingSystem.reset();
 
@@ -431,10 +440,48 @@ export class Game {
       this.emitRankingIfChanged();
     }
 
-    const collisionEvents =
+    const collisionResult =
       this.collisionSystem.detect(
-        snakes
+        snakes,
+        delta
       );
+
+    const biteResults =
+      this.predationSystem.process({
+        events: collisionResult.bites,
+        particleSystem:
+          this.particleSystem,
+      });
+
+    if (biteResults.length > 0) {
+      const playerBites =
+        biteResults.filter(
+          (result) =>
+            result.predator === this.player
+        ).length;
+
+      if (playerBites > 0) {
+        this.emitAudio(
+          "special",
+          Math.min(
+            1.35,
+            0.92 + playerBites * 0.08
+          )
+        );
+      }
+
+      this.rankingSystem.update(
+        0,
+        snakes,
+        true
+      );
+
+      this.emitRankingIfChanged(true);
+      this.emitMinimapSnapshot(true);
+    }
+
+    const collisionEvents =
+      collisionResult.deaths;
 
     if (collisionEvents.length > 0) {
       this.rankingSystem.update(

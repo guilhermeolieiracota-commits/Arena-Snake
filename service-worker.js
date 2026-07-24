@@ -1,4 +1,4 @@
-const CACHE_NAME = "snake-arena-v13-2";
+const CACHE_NAME = "snake-arena-v14-1";
 
 const APP_SHELL = [
   "./",
@@ -72,6 +72,7 @@ const APP_SHELL = [
   "./js/systems/death-system.js",
   "./js/systems/food-system.js",
   "./js/systems/particle-system.js",
+  "./js/systems/predation-system.js",
   "./js/systems/ranking-system.js",
   "./js/systems/spatial-grid.js",
   "./js/systems/spawn-system.js",
@@ -101,148 +102,82 @@ const APP_SHELL = [
 ];
 
 const toScopeUrl = (path) =>
-  new URL(
-    path,
-    self.registration.scope
-  ).href;
+  new URL(path, self.registration.scope).href;
 
-self.addEventListener(
-  "install",
-  (event) => {
-    event.waitUntil(
-      caches
-        .open(CACHE_NAME)
-        .then((cache) =>
-          cache.addAll(
-            APP_SHELL.map(
-              toScopeUrl
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll(APP_SHELL.map(toScopeUrl))
+    )
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    Promise.all([
+      caches.keys().then((cacheNames) =>
+        Promise.all(
+          cacheNames
+            .filter((cacheName) =>
+              cacheName.startsWith("snake-arena-") &&
+              cacheName !== CACHE_NAME
             )
-          )
+            .map((cacheName) => caches.delete(cacheName))
         )
-    );
+      ),
+      self.clients.claim(),
+    ])
+  );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
   }
-);
+});
 
-self.addEventListener(
-  "activate",
-  (event) => {
-    event.waitUntil(
-      Promise.all([
-        caches
-          .keys()
-          .then((cacheNames) =>
-            Promise.all(
-              cacheNames
-                .filter(
-                  (cacheName) =>
-                    cacheName.startsWith(
-                      "snake-arena-"
-                    ) &&
-                    cacheName !==
-                      CACHE_NAME
-                )
-                .map((cacheName) =>
-                  caches.delete(
-                    cacheName
-                  )
-                )
-            )
-          ),
-        self.clients.claim(),
-      ])
-    );
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+
+  if (request.method !== "GET") {
+    return;
   }
-);
 
-self.addEventListener(
-  "message",
-  (event) => {
-    if (
-      event.data?.type ===
-      "SKIP_WAITING"
-    ) {
-      self.skipWaiting();
-    }
+  const requestUrl = new URL(request.url);
+
+  if (requestUrl.origin !== self.location.origin) {
+    return;
   }
-);
 
-self.addEventListener(
-  "fetch",
-  (event) => {
-    const request = event.request;
-
-    if (
-      request.method !== "GET"
-    ) {
-      return;
-    }
-
-    const requestUrl =
-      new URL(request.url);
-
-    if (
-      requestUrl.origin !==
-      self.location.origin
-    ) {
-      return;
-    }
-
-    if (
-      request.mode === "navigate"
-    ) {
-      event.respondWith(
-        networkFirstNavigation(
-          request
-        )
-      );
-      return;
-    }
-
-    event.respondWith(
-      staleWhileRevalidate(
-        request
-      )
-    );
+  if (request.mode === "navigate") {
+    event.respondWith(networkFirstNavigation(request));
+    return;
   }
-);
 
-async function networkFirstNavigation(
-  request
-) {
-  const cache =
-    await caches.open(CACHE_NAME);
+  event.respondWith(staleWhileRevalidate(request));
+});
+
+async function networkFirstNavigation(request) {
+  const cache = await caches.open(CACHE_NAME);
 
   try {
-    const response =
-      await fetch(request);
+    const response = await fetch(request);
 
     if (response.ok) {
-      cache.put(
-        request,
-        response.clone()
-      );
+      cache.put(request, response.clone());
     }
 
     return response;
   } catch {
-    const cachedNavigation =
-      await cache.match(
-        request,
-        {
-          ignoreSearch: true,
-        }
-      );
+    const cachedNavigation = await cache.match(request, {
+      ignoreSearch: true,
+    });
 
     if (cachedNavigation) {
       return cachedNavigation;
     }
 
-    const cachedIndex =
-      await cache.match(
-        toScopeUrl(
-          "./index.html"
-        )
-      );
+    const cachedIndex = await cache.match(toScopeUrl("./index.html"));
 
     if (cachedIndex) {
       return cachedIndex;
@@ -253,62 +188,42 @@ async function networkFirstNavigation(
       {
         status: 503,
         headers: {
-          "Content-Type":
-            "text/plain; charset=utf-8",
+          "Content-Type": "text/plain; charset=utf-8",
         },
       }
     );
   }
 }
 
-async function staleWhileRevalidate(
-  request
-) {
-  const cache =
-    await caches.open(CACHE_NAME);
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cachedResponse = await cache.match(request, {
+    ignoreSearch: true,
+  });
 
-  const cachedResponse =
-    await cache.match(
-      request,
-      {
-        ignoreSearch: true,
+  const networkResponsePromise = fetch(request)
+    .then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
       }
-    );
 
-  const networkResponsePromise =
-    fetch(request)
-      .then((response) => {
-        if (response.ok) {
-          cache.put(
-            request,
-            response.clone()
-          );
-        }
-
-        return response;
-      })
-      .catch(() => null);
+      return response;
+    })
+    .catch(() => null);
 
   if (cachedResponse) {
-    networkResponsePromise.catch(
-      () => null
-    );
+    networkResponsePromise.catch(() => null);
     return cachedResponse;
   }
 
-  const networkResponse =
-    await networkResponsePromise;
+  const networkResponse = await networkResponsePromise;
 
   if (networkResponse) {
     return networkResponse;
   }
 
-  return new Response(
-    "",
-    {
-      status: 504,
-      statusText:
-        "Gateway Timeout",
-    }
-  );
+  return new Response("", {
+    status: 504,
+    statusText: "Gateway Timeout",
+  });
 }

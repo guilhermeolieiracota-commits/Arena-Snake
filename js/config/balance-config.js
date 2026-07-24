@@ -64,6 +64,19 @@ export const BALANCE_CONFIG = Object.freeze({
     borderRadiusScale: 0.82,
   }),
 
+  predation: Object.freeze({
+    massAdvantageRatio: 1.16,
+    segmentAdvantage: 3,
+    minimumVictimSegments: 8,
+    minimumVictimMass: 10,
+    minimumVictimRadiusFactor: 0.72,
+    victimMassLossPerBite: 5,
+    predatorMassGainPerBite: 8,
+    scorePerBite: 4,
+    biteCooldownSeconds: 0.20,
+    biteCollisionScale: 0.92,
+  }),
+
   death: Object.freeze({
     remainsSegmentStep: 2,
     remainsMinimum: 10,

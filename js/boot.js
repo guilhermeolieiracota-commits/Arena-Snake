@@ -1,4 +1,4 @@
-const BOOT_FIX_VERSION = "13-4";
+const BOOT_FIX_VERSION = "14-1";
 const BOOT_MARKER_KEY = "snake_arena_boot_fix";
 
 const loadingScreen = document.querySelector("#loadingScreen");

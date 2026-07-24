@@ -566,6 +566,9 @@ let debugVisible = false;
 let loadingFinished = false;
 let achievementToastTimer = null;
 let rewardToastTimer = null;
+let toastQueueTimer = null;
+let toastQueueActive = false;
+const toastQueue = [];
 let lastAchievementEvaluationTime = -Infinity;
 let liveSessionSnapshot = {};
 let sessionRewardStart = {
@@ -726,6 +729,11 @@ const setGameInterfaceVisibility = (
   );
 
   elements.killFeed.hidden = !visible;
+
+  document.body.classList.toggle(
+    "gameplay-active",
+    visible
+  );
 };
 
 const restoreOverlayRoot = () => {
@@ -1459,37 +1467,88 @@ const updateCoinBalance = (
     value;
 };
 
+const isZeroValueReward = (name) =>
+  /^\+?0(?:[.,]0+)?\s*(?:moedas?|xp|pontos?)$/i.test(
+    String(name ?? "").trim()
+  );
+
+const processToastQueue = () => {
+  if (
+    toastQueueActive ||
+    toastQueue.length === 0
+  ) {
+    return;
+  }
+
+  toastQueueActive = true;
+  const toast = toastQueue.shift();
+
+  window.clearTimeout(toastQueueTimer);
+  elements.rewardToast.hidden = true;
+  elements.achievementToast.hidden = true;
+
+  if (toast.type === "achievement") {
+    elements.achievementToastIcon.textContent =
+      toast.icon;
+    elements.achievementToastName.textContent =
+      toast.name;
+    elements.achievementToast.hidden = false;
+  } else {
+    elements.rewardToastIcon.textContent =
+      toast.icon;
+    elements.rewardToastLabel.textContent =
+      toast.label;
+    elements.rewardToastName.textContent =
+      toast.name;
+    elements.rewardToast.hidden = false;
+  }
+
+  audioManager.playEvent(
+    toast.sound,
+    toast.volume ?? 1.05
+  );
+
+  const mobile = window.matchMedia(
+    "(max-width: 720px)"
+  ).matches;
+
+  toastQueueTimer = window.setTimeout(
+    () => {
+      elements.rewardToast.hidden = true;
+      elements.achievementToast.hidden = true;
+      toastQueueActive = false;
+      processToastQueue();
+    },
+    mobile ? 2300 : toast.duration ?? 3200
+  );
+};
+
+const enqueueToast = (toast) => {
+  toastQueue.push(toast);
+  processToastQueue();
+};
+
 const showRewardToast = ({
   icon = "🪙",
   label = "Recompensa recebida",
   name,
   sound = "coins",
 }) => {
-  window.clearTimeout(
-    rewardToastTimer
-  );
+  if (
+    !name ||
+    isZeroValueReward(name)
+  ) {
+    return;
+  }
 
-  elements.rewardToastIcon.textContent =
-    icon;
-  elements.rewardToastLabel.textContent =
-    label;
-  elements.rewardToastName.textContent =
-    name;
-  elements.rewardToast.hidden = false;
-
-  audioManager.playEvent(
+  enqueueToast({
+    type: "reward",
+    icon,
+    label,
+    name,
     sound,
-    1.05
-  );
-
-  rewardToastTimer =
-    window.setTimeout(
-      () => {
-        elements.rewardToast.hidden =
-          true;
-      },
-      3200
-    );
+    duration: 3200,
+  });
 };
 
 const getDailyContext = (
@@ -2556,23 +2615,14 @@ const renderAchievements = () => {
 const showAchievementToast = (
   achievement
 ) => {
-  window.clearTimeout(
-    achievementToastTimer
-  );
-
-  elements.achievementToastIcon.textContent =
-    achievement.icon;
-
-  elements.achievementToastName.textContent =
-    achievement.name;
-
-  elements.achievementToast.hidden =
-    false;
-
-  audioManager.playEvent(
-    "achievement",
-    1.15
-  );
+  enqueueToast({
+    type: "achievement",
+    icon: achievement.icon,
+    name: achievement.name,
+    sound: "achievement",
+    volume: 1.15,
+    duration: 3600,
+  });
 
   const coinReward =
     economySystem.addCoins(
@@ -2599,15 +2649,6 @@ const showAchievementToast = (
       sound: "coins",
     });
   }
-
-  achievementToastTimer =
-    window.setTimeout(
-      () => {
-        elements.achievementToast.hidden =
-          true;
-      },
-      3600
-    );
 
   renderAchievements();
 };
