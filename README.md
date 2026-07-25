@@ -1,23 +1,26 @@
-# Snake Arena — Fase 15.4.2 Final
+# Snake Arena — Fase 16 Final
 
-Esta versão foi construída sobre a Fase 15.3, sem recriar o projeto do zero.
+Esta versão foi construída diretamente sobre a Fase 15.4.3. O projeto anterior foi preservado e recebeu apenas os sistemas e ajustes necessários.
 
-## Novidades da Fase 15.4.1
+## Destaques da Fase 16
 
-Esta atualização foca em fidelidade visual ao mockup aprovado da nova tela inicial.
+- criação de conta Supabase revisada;
+- confirmação de senha e mensagens de erro em português;
+- partidas de 2 minutos;
+- fases progressivamente mais difíceis;
+- avanço ao sobreviver e repetição da fase ao morrer;
+- encerramento total da tentativa ao sair da tela;
+- interrupção do loop, bots, controles, áudio, partículas e requisições pendentes;
+- cobra ganha comprimento e volume conforme cresce;
+- câmera e colisões acompanham o novo tamanho;
+- nova favicon e novos ícones do aplicativo;
+- fase atual, maior fase e fases concluídas salvas no progresso.
 
-- cabeçalho do menu inicial agora usa a arte visual do mockup;
-- layout do topo ficou muito mais próximo da referência;
-- ícones dos cartões foram substituídos por ícones visuais próprios;
-- ajustes rápidos ficaram compactos e fiéis ao design aprovado;
-- cartões `Progresso`, `Personalizar` e `Sistema` ficaram mais minimalistas e recolhidos por padrão;
-- versão mobile ficou mais próxima da aparência planejada;
-- cache offline atualizado para `snake-arena-v15-4-1`.
-- correção do topo no mobile com reset de rolagem ao abrir/recarregar.
-- banner do cabeçalho embutido diretamente no HTML para não falhar no carregamento.
-- alinhamento dos ícones refinado para evitar descentralização visual.
+Leia também:
 
-Detalhes completos: `ALTERACOES-FASE-15-4.md`.
+- `ALTERACOES-FASE-16.md`
+- `CONFIGURAR-CADASTRO-SUPABASE-FASE-16.md`
+- `tests/fase-16-checklist.md`
 
 ## Novos recursos
 

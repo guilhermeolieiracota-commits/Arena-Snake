@@ -1439,3 +1439,34 @@
     height: 38px;
   }
 }
+
+@media (max-width: 720px) {
+  body.gameplay-active .hud-card--stage,
+  body.gameplay-active .hud-card--timer {
+    display: grid;
+  }
+
+  body.gameplay-active .hud-card--stage {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  body.gameplay-active .hud-card--timer {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .stage-complete-hero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .stage-home-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-complete-panel {
+    padding: 22px 16px;
+  }
+}

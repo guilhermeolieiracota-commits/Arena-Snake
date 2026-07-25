@@ -233,8 +233,8 @@ const migrated =
 
 assert.equal(
   migrated.version,
-  7,
-  "Novo save deve usar versão 7."
+  8,
+  "Novo save deve usar versão 8."
 );
 
 assert.equal(

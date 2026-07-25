@@ -37,13 +37,27 @@ export class CloudSessionService {
     email,
     password,
     nickname,
+    redirectTo,
   }) {
     const response =
       await this.client.signUp({
         email,
         password,
         nickname,
+        redirectTo,
       });
+
+    const identities =
+      response?.user?.identities;
+
+    if (
+      Array.isArray(identities) &&
+      identities.length === 0
+    ) {
+      throw new Error(
+        "Este e-mail já está cadastrado. Use Entrar ou recuperar a senha."
+      );
+    }
 
     if (
       response?.access_token

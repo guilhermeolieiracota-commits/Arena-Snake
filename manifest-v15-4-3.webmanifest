@@ -2,10 +2,10 @@
   "id": "./",
   "name": "Snake Arena",
   "short_name": "Snake Arena",
-  "description": "Snake Arena com partidas de dois minutos, fases progressivas, modo offline, conta opcional e ranking global.",
+  "description": "Jogo de arena com modo offline, layout mobile otimizado, bordas seguras e cobras maiores capazes de consumir segmentos das menores.",
   "lang": "pt-BR",
   "dir": "ltr",
-  "start_url": "./?source=pwa&version=16-0",
+  "start_url": "./?source=pwa&version=15-4-3",
   "scope": "./",
   "display": "standalone",
   "display_override": [
@@ -21,19 +21,19 @@
   ],
   "icons": [
     {
-      "src": "./assets/icons/snake-arena-icon-192-v16.png",
+      "src": "./assets/icons/snake-arena-icon-192-v1543.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./assets/icons/snake-arena-icon-512-v16.png",
+      "src": "./assets/icons/snake-arena-icon-512-v1543.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./assets/icons/snake-arena-maskable-512-v16.png",
+      "src": "./assets/icons/snake-arena-maskable-512-v1543.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

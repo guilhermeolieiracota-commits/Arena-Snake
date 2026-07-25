@@ -155,7 +155,10 @@ export class StorageService {
       : null;
 
     stats.gamesPlayed += 1;
-    stats.deaths += 1;
+
+    if (!result.completed) {
+      stats.deaths += 1;
+    }
     stats.totalPlaySeconds += Math.max(
       0,
       Number(result.elapsedTime) || 0
@@ -2072,6 +2075,31 @@ export class StorageService {
         )
       ),
       activityDates,
+      currentStage: Math.max(
+        1,
+        Math.round(
+          Number(value?.currentStage) || 1
+        )
+      ),
+      highestStage: Math.max(
+        1,
+        Math.round(
+          Number(value?.highestStage) ||
+            Number(value?.currentStage) ||
+            1
+        )
+      ),
+      stagesCompleted: Math.max(
+        0,
+        Math.round(
+          Number(value?.stagesCompleted) || 0
+        )
+      ),
+      lastStageCompletedAt:
+        typeof value?.lastStageCompletedAt ===
+        "string"
+          ? value.lastStageCompletedAt
+          : null,
     };
   }
 
@@ -2229,6 +2257,14 @@ export class StorageService {
           ],
           "normal"
         ),
+      stage: Math.max(
+        1,
+        Math.round(
+          number(value?.stage, 1)
+        )
+      ),
+      completed:
+        Boolean(value?.completed),
       score:
         number(value?.score),
       maximumMass:

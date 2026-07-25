@@ -10,11 +10,12 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Snake Arena">
   <meta name="description" content="Snake Arena com perfil público, comunidade online, recuperação de conta, ranking global avançado, nuvem e modo offline.">
-  <title>Snake Arena — Fase 15.4.2</title>
+  <title>Snake Arena — Fase 16</title>
 
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="./manifest-v16.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/snake-arena-favicon-32-v16.png">
+  <link rel="shortcut icon" href="./assets/icons/snake-arena-favicon-v16.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/icons/snake-arena-apple-touch-v16.png">
 
   <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/variables.css">
@@ -134,6 +135,17 @@
             </summary>
 
             <div class="menu-summary-card__content menu-progress-panel">
+              <div class="stage-home-summary">
+                <span>
+                  <small>Fase atual</small>
+                  <strong id="currentStageMenuValue">Fase 1</strong>
+                </span>
+                <span>
+                  <small>Maior fase</small>
+                  <strong id="highestStageMenuValue">Fase 1</strong>
+                </span>
+              </div>
+
               <div class="selected-skin-line">
                 <span>Skin atual</span>
                 <strong id="selectedSkinMenuValue">Menta Neon</strong>
@@ -224,129 +236,6 @@
             </summary>
 
             <div class="menu-summary-card__content">
-              <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
-                <span id="onlineSummaryIcon">☁️</span>
-                <span>
-                  <small id="onlineSummaryLabel">Modo local</small>
-                  <strong id="onlineSummaryValue">Conectar conta</strong>
-                </span>
-                <span id="onlineSummaryState" class="online-summary-button__state">Offline seguro</span>
-              </button>
-
-              <div class="menu-subactions-grid menu-subactions-grid--system">
-                <button id="openOnlineButton" class="menu-tool-button menu-tool-button--online" type="button"><span>☁️</span> Online</button>
-                <button id="openDataButton" class="menu-tool-button menu-tool-button--data" type="button"><span>💾</span> Dados</button>
-                <button id="openSettingsButton" class="menu-tool-button" type="button"><span>⚙️</span> Configurações</button>
-                <button id="menuFullscreenButton" class="menu-tool-button" type="button"><span>⛶</span> Tela cheia</button>
-                <button id="installAppButton" class="menu-tool-button menu-tool-button--accent pwa-install-hidden" type="button"><span>⬇️</span> Instalar app</button>
-              </div>
-            </div>
-          </details>
-        </div>
-      </div>
-    </section>
-
-          <details class="menu-accordion" open>
-            <summary class="menu-accordion__summary menu-accordion__summary--progress">
-              <span class="menu-accordion__icon" aria-hidden="true">◎</span>
-              <span class="menu-accordion__text">
-                <strong>Progresso</strong>
-                <small>Acompanhe sua jornada</small>
-              </span>
-              <span class="menu-accordion__arrow" aria-hidden="true">›</span>
-            </summary>
-
-            <div class="menu-accordion__content menu-progress-panel">
-              <div class="selected-skin-line">
-                <span>Skin atual</span>
-                <strong id="selectedSkinMenuValue">Menta Neon</strong>
-              </div>
-
-              <div class="menu-wallet">
-                <span>
-                  <small>Saldo</small>
-                  <strong>🪙 <span id="coinBalanceMenuValue">180</span></strong>
-                </span>
-                <button id="openDailySummaryButton" type="button">
-                  <small>Missões do dia</small>
-                  <strong id="dailySummaryValue">0/3</strong>
-                </button>
-              </div>
-
-              <button id="openProfileSummaryButton" class="profile-summary-button" type="button">
-                <span class="profile-summary-button__level">
-                  <small>Nível</small>
-                  <strong id="profileLevelMenuValue">1</strong>
-                </span>
-                <span>
-                  <small id="profileTitleMenuValue">Novato da Arena</small>
-                  <strong id="profileXpMenuValue">0/105 XP</strong>
-                </span>
-                <span class="profile-summary-button__arrow" aria-hidden="true">›</span>
-              </button>
-
-              <div class="season-menu-summary">
-                <button id="openSeasonSummaryButton" type="button">
-                  <small>Temporada</small>
-                  <strong id="seasonMenuValue">Nível 1/20</strong>
-                </button>
-                <button id="openWeeklySummaryButton" type="button">
-                  <small>Evento semanal</small>
-                  <strong id="weeklyMenuValue">0/3</strong>
-                </button>
-              </div>
-
-              <button id="openCompetitiveSummaryButton" class="competitive-summary-button" type="button">
-                <span id="competitiveLeagueIconMenu">🥉</span>
-                <span>
-                  <small id="competitiveLeagueMenuValue">Bronze</small>
-                  <strong><span id="competitiveRatingMenuValue">1000</span> pontos</strong>
-                </span>
-                <span class="competitive-summary-button__streak">🔥 <strong id="streakMenuValue">0</strong></span>
-              </button>
-
-              <div class="menu-subactions-grid menu-subactions-grid--progress">
-                <button id="openCompetitiveButton" class="menu-tool-button menu-tool-button--competitive" type="button"><span>🏆</span> Competitivo</button>
-                <button id="openProfileButton" class="menu-tool-button menu-tool-button--profile" type="button"><span>👤</span> Perfil</button>
-                <button id="openDailyButton" class="menu-tool-button menu-tool-button--daily" type="button"><span>📅</span> Missões</button>
-                <button id="openSeasonButton" class="menu-tool-button menu-tool-button--season" type="button"><span>🌀</span> Temporada</button>
-                <button id="openWeeklyButton" class="menu-tool-button menu-tool-button--weekly" type="button"><span>🎪</span> Evento</button>
-                <button id="openHistoryButton" class="menu-tool-button menu-tool-button--history" type="button"><span>📜</span> Histórico</button>
-                <button id="openStatsButton" class="menu-tool-button" type="button"><span>📊</span> Recordes</button>
-                <button id="openAchievementsButton" class="menu-tool-button" type="button"><span>🏅</span> Conquistas</button>
-              </div>
-            </div>
-          </details>
-
-          <details class="menu-accordion">
-            <summary class="menu-accordion__summary menu-accordion__summary--customize">
-              <span class="menu-accordion__icon" aria-hidden="true">◉</span>
-              <span class="menu-accordion__text">
-                <strong>Personalizar</strong>
-                <small>Deixe sua cobra única</small>
-              </span>
-              <span class="menu-accordion__arrow" aria-hidden="true">›</span>
-            </summary>
-
-            <div class="menu-accordion__content">
-              <div class="menu-subactions-grid menu-subactions-grid--two">
-                <button id="openSkinsButton" class="menu-tool-button" type="button"><span>🎨</span> Skins</button>
-                <button id="openShopButton" class="menu-tool-button menu-tool-button--shop" type="button"><span>🛍️</span> Loja</button>
-              </div>
-            </div>
-          </details>
-
-          <details class="menu-accordion">
-            <summary class="menu-accordion__summary menu-accordion__summary--system">
-              <span class="menu-accordion__icon" aria-hidden="true">⚙</span>
-              <span class="menu-accordion__text">
-                <strong>Sistema</strong>
-                <small>Ajustes e preferências</small>
-              </span>
-              <span class="menu-accordion__arrow" aria-hidden="true">›</span>
-            </summary>
-
-            <div class="menu-accordion__content">
               <button id="openOnlineSummaryButton" class="online-summary-button" type="button">
                 <span id="onlineSummaryIcon">☁️</span>
                 <span>
@@ -579,6 +468,10 @@
             <label class="field field--wide">
               <span>Senha</span>
               <input id="onlinePasswordInput" type="password" minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres">
+            </label>
+            <label class="field field--wide">
+              <span>Confirmar senha <small>(somente para criar conta)</small></span>
+              <input id="onlineSignupConfirmPasswordInput" type="password" minlength="6" autocomplete="new-password" placeholder="Repita a senha para cadastrar">
             </label>
           </div>
           <div class="panel-actions panel-actions--horizontal">
@@ -939,6 +832,8 @@
           <div><span>Partidas</span><strong id="profileGamesValue">0</strong></div>
           <div><span>Melhor score</span><strong id="profileBestScoreValue">0</strong></div>
           <div><span>Eliminações</span><strong id="profileEliminationsValue">0</strong></div>
+          <div><span>Maior fase</span><strong id="profileHighestStageValue">Fase 1</strong></div>
+          <div><span>Fases concluídas</span><strong id="profileStagesCompletedValue">0</strong></div>
         </div>
 
         <div class="profile-history">
@@ -1235,10 +1130,72 @@
       </div>
     </section>
 
+    <section id="stageCompleteScreen" class="screen" aria-labelledby="stageCompleteTitle">
+      <div class="panel game-over-panel stage-complete-panel">
+        <p class="eyebrow">Fase concluída</p>
+        <h2 id="stageCompleteTitle">Você sobreviveu!</h2>
+        <p class="subtitle">
+          O cronômetro chegou a zero. A próxima fase terá rivais mais rápidos, atentos e agressivos.
+        </p>
+
+        <div class="stage-complete-hero">
+          <span>
+            <small>Fase vencida</small>
+            <strong id="completedStageValue">Fase 1</strong>
+          </span>
+          <span>
+            <small>Próxima fase</small>
+            <strong id="nextStageValue">Fase 2</strong>
+          </span>
+          <span>
+            <small>Nova dificuldade</small>
+            <strong id="nextStageDifficultyValue">Crescente</strong>
+          </span>
+        </div>
+
+        <div class="result-grid">
+          <div class="result-card"><span>Pontuação</span><strong id="stageFinalScoreValue">0</strong></div>
+          <div class="result-card"><span>Maior massa</span><strong id="stageFinalMassValue">120</strong></div>
+          <div class="result-card"><span>Eliminações</span><strong id="stageFinalEliminationsValue">0</strong></div>
+          <div class="result-card"><span>Posição</span><strong id="stageFinalRankValue">—</strong></div>
+          <div class="result-card result-card--coins"><span>Moedas ganhas</span><strong>🪙 <span id="stageCoinsEarnedValue">0</span></strong></div>
+          <div class="result-card result-card--xp"><span>XP recebido</span><strong>⭐ <span id="stageXpEarnedValue">0</span></strong></div>
+        </div>
+
+        <button id="nextStageButton" class="button button--primary" type="button">Jogar próxima fase</button>
+        <button id="stageCompleteMenuButton" class="button button--secondary" type="button">Voltar à Home</button>
+      </div>
+    </section>
+
+    <section id="runTerminatedScreen" class="screen" aria-labelledby="runTerminatedTitle">
+      <div class="panel panel--small run-terminated-panel">
+        <p class="eyebrow">Partida encerrada</p>
+        <h2 id="runTerminatedTitle">O jogo saiu da tela</h2>
+        <p class="subtitle">
+          A tentativa foi finalizada e toda a atividade da partida foi interrompida. Nada continuou rodando em segundo plano.
+        </p>
+        <div class="run-terminated-stage">
+          <span>Fase interrompida</span>
+          <strong id="terminatedStageValue">Fase 1</strong>
+        </div>
+        <button id="terminatedHomeButton" class="button button--primary" type="button">Voltar à Home</button>
+      </div>
+    </section>
+
     <section id="gameHud" class="game-hud" aria-live="polite" aria-hidden="true">
       <div class="hud-card hud-card--player">
         <span class="hud-label">Jogador</span>
         <strong id="playerNameValue">Jogador</strong>
+      </div>
+
+      <div class="hud-card hud-card--stage">
+        <span class="hud-label">Fase</span>
+        <strong id="stageHudValue">1</strong>
+      </div>
+
+      <div class="hud-card hud-card--timer">
+        <span class="hud-label" id="stageDifficultyHudValue">Iniciante</span>
+        <strong id="stageTimerValue">2:00</strong>
       </div>
 
       <div class="hud-card hud-card--score">
@@ -1399,6 +1356,8 @@
       <span>Histórico: <strong id="historyDebugValue">0</strong></span>
       <span>Sequência: <strong id="streakDebugValue">0</strong></span>
       <span>Nuvem: <strong id="cloudDebugValue">local</strong></span>
+      <span>Fase: <strong id="stageDebugValue">1</strong></span>
+      <span>Tempo da fase: <strong id="stageTimerDebugValue">2:00</strong></span>
     </aside>
   </main>
 

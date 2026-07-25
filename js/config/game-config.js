@@ -1,8 +1,8 @@
 export const GAME_CONFIG = Object.freeze({
   name: "Snake Arena",
-  version: "0.15.2",
-  saveVersion: 7,
-  cacheVersion: "snake-arena-v15-2",
-  developmentMode: true,
+  version: "0.16.0",
+  saveVersion: 8,
+  cacheVersion: "snake-arena-v16-0",
+  developmentMode: false,
   language: "pt-BR",
 });

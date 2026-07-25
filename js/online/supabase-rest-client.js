@@ -35,6 +35,7 @@ export class SupabaseRestClient {
       publishableKey ?? ""
     ).trim();
     this.fetchImpl = fetchImpl;
+    this.pendingControllers = new Set();
   }
 
   get configured() {
@@ -49,9 +50,14 @@ export class SupabaseRestClient {
     email,
     password,
     nickname,
+    redirectTo,
   }) {
+    const query = redirectTo
+      ? `?redirect_to=${encodeURIComponent(redirectTo)}`
+      : "";
+
     return this.requestAuth(
-      "/auth/v1/signup",
+      `/auth/v1/signup${query}`,
       {
         method: "POST",
         body: {
@@ -238,6 +244,73 @@ export class SupabaseRestClient {
     );
   }
 
+  translateAuthError(message, status = 0, code = "") {
+    const normalized = String(message || "").toLowerCase();
+    const normalizedCode = String(code || "").toLowerCase();
+
+    if (
+      normalized.includes("user already registered") ||
+      normalizedCode.includes("user_already_exists")
+    ) {
+      return "Este e-mail já está cadastrado. Use Entrar ou recuperar a senha.";
+    }
+
+    if (
+      normalized.includes("email not confirmed") ||
+      normalizedCode.includes("email_not_confirmed")
+    ) {
+      return "Confirme seu e-mail antes de entrar. Verifique também a pasta de spam.";
+    }
+
+    if (
+      normalized.includes("signup is disabled") ||
+      normalized.includes("signups not allowed")
+    ) {
+      return "A criação de contas está desativada no Supabase. Ative o provedor de e-mail em Authentication.";
+    }
+
+    if (
+      normalized.includes("rate limit") ||
+      status === 429
+    ) {
+      return "Muitas tentativas foram feitas. Aguarde alguns minutos e tente novamente.";
+    }
+
+    if (
+      normalized.includes("password") &&
+      normalized.includes("6")
+    ) {
+      return "A senha precisa ter pelo menos 6 caracteres.";
+    }
+
+    if (
+      normalized.includes("invalid email") ||
+      normalized.includes("validate email")
+    ) {
+      return "Digite um endereço de e-mail válido.";
+    }
+
+    if (
+      normalized.includes("invalid login credentials")
+    ) {
+      return "E-mail ou senha incorretos.";
+    }
+
+    return String(message || "Não foi possível concluir a operação.");
+  }
+
+  abortPendingRequests() {
+    for (const controller of this.pendingControllers) {
+      try {
+        controller.abort();
+      } catch {
+        // Sem ação necessária.
+      }
+    }
+
+    this.pendingControllers.clear();
+  }
+
   async request(
     url,
     {
@@ -252,34 +325,47 @@ export class SupabaseRestClient {
       );
     }
 
+    const controller = new AbortController();
+    this.pendingControllers.add(controller);
+
+    const timeoutId = globalThis.setTimeout(
+      () => controller.abort(),
+      15000
+    );
+
     let response;
 
     try {
-      response =
-        await this.fetchImpl(
-          url,
-          {
-            method,
-            headers,
-            body:
-              body === undefined
-                ? undefined
-                : JSON.stringify(
-                    body
-                  ),
-          }
-        );
+      response = await this.fetchImpl(
+        url,
+        {
+          method,
+          headers,
+          signal: controller.signal,
+          body:
+            body === undefined
+              ? undefined
+              : JSON.stringify(body),
+        }
+      );
     } catch (error) {
+      const aborted =
+        error?.name === "AbortError";
+
       throw new SupabaseRequestError(
-        "Não foi possível conectar ao servidor.",
+        aborted
+          ? "A conexão demorou demais ou foi interrompida. Tente novamente."
+          : "Não foi possível conectar ao servidor.",
         {
           details: error,
         }
       );
+    } finally {
+      globalThis.clearTimeout(timeoutId);
+      this.pendingControllers.delete(controller);
     }
 
-    const raw =
-      await response.text();
+    const raw = await response.text();
 
     let payload = null;
 
@@ -292,24 +378,28 @@ export class SupabaseRestClient {
     }
 
     if (!response.ok) {
-      const message =
+      const sourceMessage =
         payload?.msg ??
         payload?.message ??
         payload?.error_description ??
         payload?.error ??
         `Erro HTTP ${response.status}`;
 
+      const code =
+        payload?.code ??
+        payload?.error_code ??
+        "";
+
       throw new SupabaseRequestError(
-        String(message),
+        this.translateAuthError(
+          sourceMessage,
+          response.status,
+          code
+        ),
         {
-          status:
-            response.status,
-          code:
-            payload?.code ??
-            payload?.error_code ??
-            "",
-          details:
-            payload,
+          status: response.status,
+          code,
+          details: payload,
         }
       );
     }

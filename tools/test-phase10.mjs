@@ -101,7 +101,7 @@ const migrated =
 
 assert.equal(
   migrated.version,
-  7,
+  8,
   "Save deve migrar para a versão atual."
 );
 

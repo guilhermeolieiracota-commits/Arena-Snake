@@ -80,15 +80,13 @@ export class CollisionSystem {
         index += 1
       ) {
         const segment = segments[index];
-        const taper = Math.max(
-          0.48,
-          1 - index / (segments.length * 1.32)
-        );
-
         const proxy = {
           x: segment.x,
           y: segment.y,
-          radius: snake.radius * taper,
+          radius: snake.getBodyRadius(
+            index,
+            segments.length
+          ),
           snake,
           segmentIndex: index,
         };

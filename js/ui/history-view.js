@@ -106,6 +106,12 @@ export function renderMatchHistory({
 
     const fields = [
       [
+        "Fase",
+        `${Math.max(1, Number(match.stage) || 1)}${
+          match.completed ? " ✓" : ""
+        }`,
+      ],
+      [
         "Pontuação",
         Math.round(
           match.score

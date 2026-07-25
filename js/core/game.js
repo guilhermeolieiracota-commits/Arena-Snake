@@ -16,6 +16,11 @@ import { ParticleSystem } from "../systems/particle-system.js";
 import { PredationSystem } from "../systems/predation-system.js";
 import { RankingSystem } from "../systems/ranking-system.js";
 import { clamp } from "../utils/math.js";
+import {
+  STAGE_CONFIG,
+  getStageDifficultyLabel,
+  normalizeStage,
+} from "../stages/stage-config.js";
 
 const MINIMAP_UPDATE_INTERVAL = 0.14;
 const COMMON_AUDIO_INTERVAL = 0.055;
@@ -34,6 +39,8 @@ export class Game {
     onMinimapUpdate,
     onAudioEvent,
     onGameOver,
+    onStageComplete,
+    onRunTerminated,
   }) {
     this.canvas = canvas;
     this.onStateChange = onStateChange;
@@ -43,9 +50,17 @@ export class Game {
     this.onMinimapUpdate = onMinimapUpdate;
     this.onAudioEvent = onAudioEvent;
     this.onGameOver = onGameOver;
+    this.onStageComplete = onStageComplete;
+    this.onRunTerminated = onRunTerminated;
 
     this.state = GameState.MENU;
     this.elapsedTime = 0;
+    this.stageNumber = 1;
+    this.stageDuration =
+      STAGE_CONFIG.durationSeconds;
+    this.stageRemaining =
+      this.stageDuration;
+    this.lifecycleTerminated = false;
     this.nickname = "Jogador";
     this.skinId = DEFAULT_SKIN_ID;
     this.boundaryDanger = 0;
@@ -107,6 +122,9 @@ export class Game {
     this.handleVisibilityChange =
       this.handleVisibilityChange.bind(this);
 
+    this.handleLifecycleExit =
+      this.handleLifecycleExit.bind(this);
+
     this.handleKeyDown =
       this.handleKeyDown.bind(this);
   }
@@ -125,6 +143,26 @@ export class Game {
     );
 
     window.addEventListener(
+      "pagehide",
+      this.handleLifecycleExit
+    );
+
+    window.addEventListener(
+      "beforeunload",
+      this.handleLifecycleExit
+    );
+
+    window.addEventListener(
+      "blur",
+      this.handleLifecycleExit
+    );
+
+    document.addEventListener(
+      "freeze",
+      this.handleLifecycleExit
+    );
+
+    window.addEventListener(
       "keydown",
       this.handleKeyDown
     );
@@ -137,7 +175,7 @@ export class Game {
     this.rankingSystem.reset();
     this.deathSystem.reset();
 
-    this.loop.start();
+    this.loop.stop();
     this.setState(GameState.MENU);
   }
 
@@ -221,8 +259,17 @@ export class Game {
     }
   }
 
-  start(nickname = "Jogador") {
+  start(
+    nickname = "Jogador",
+    { stage = 1 } = {}
+  ) {
     this.setNickname(nickname);
+    this.stageNumber = normalizeStage(stage);
+    this.stageDuration =
+      STAGE_CONFIG.durationSeconds;
+    this.stageRemaining =
+      this.stageDuration;
+    this.lifecycleTerminated = false;
     this.elapsedTime = 0;
     this.boundaryDanger = 0;
     this.minimapAccumulator = 0;
@@ -244,6 +291,10 @@ export class Game {
       this.difficultyId
     );
 
+    this.botSystem.setStage(
+      this.stageNumber
+    );
+
     this.botSystem.setQuality(
       this.qualityName,
       this.player
@@ -257,6 +308,7 @@ export class Game {
     this.input.setEnabled(true);
     this.input.setBoostAvailable(true);
 
+    this.loop.start();
     this.loop.setPaused(false);
     this.setState(GameState.PLAYING);
 
@@ -268,6 +320,9 @@ export class Game {
 
   restart() {
     this.elapsedTime = 0;
+    this.stageRemaining =
+      this.stageDuration;
+    this.lifecycleTerminated = false;
     this.boundaryDanger = 0;
     this.minimapAccumulator = 0;
     this.lastPlayerBoostActive = false;
@@ -295,6 +350,10 @@ export class Game {
     this.deathSystem.reset();
     this.rankingSystem.reset();
 
+    this.botSystem.setStage(
+      this.stageNumber
+    );
+
     this.botSystem.reset(
       this.player,
       this.particleSystem
@@ -308,6 +367,7 @@ export class Game {
     this.input.setEnabled(true);
     this.input.setBoostAvailable(true);
 
+    this.loop.start();
     this.loop.setPaused(false);
     this.setState(GameState.PLAYING);
 
@@ -347,8 +407,16 @@ export class Game {
 
   returnToMenu() {
     this.input.setEnabled(false);
-    this.loop.setPaused(false);
+    this.input.reset();
+    this.boostSystem.reset();
+    this.loop.stop();
     this.setState(GameState.MENU);
+  }
+
+  startNextStage(stageNumber) {
+    this.start(this.nickname, {
+      stage: stageNumber,
+    });
   }
 
   update = (delta) => {
@@ -360,8 +428,18 @@ export class Game {
     }
 
     this.elapsedTime += delta;
+    this.stageRemaining = Math.max(
+      0,
+      this.stageDuration -
+        this.elapsedTime
+    );
     this.minimapAccumulator += delta;
     this.deathSystem.update(delta);
+
+    if (this.stageRemaining <= 0) {
+      this.handleStageCompletion();
+      return;
+    }
 
     const requestedDirection =
       this.input.getDirection();
@@ -650,11 +728,18 @@ export class Game {
 
   handlePlayerDeath(result) {
     this.input.setEnabled(false);
-    this.loop.setPaused(true);
+    this.input.reset();
+    this.loop.stop();
     this.setState(GameState.GAME_OVER);
 
     this.onGameOver?.({
       reason: result.reason,
+      completed: false,
+      stage: this.stageNumber,
+      difficultyLabel:
+        getStageDifficultyLabel(
+          this.stageNumber
+        ),
       killerName:
         result.killer?.name ?? null,
       score: this.player.score,
@@ -670,6 +755,110 @@ export class Game {
       totalCompetitors:
         result.totalCompetitors,
     });
+  }
+
+  buildRunResult({
+    reason,
+    completed = false,
+  }) {
+    return {
+      reason,
+      completed,
+      stage: this.stageNumber,
+      difficultyLabel:
+        getStageDifficultyLabel(
+          this.stageNumber
+        ),
+      score: this.player?.score ?? 0,
+      maximumMass:
+        this.player?.maximumMass ?? 0,
+      eliminations:
+        this.player?.eliminations ?? 0,
+      collected:
+        this.player?.collectedCount ?? 0,
+      elapsedTime: Math.min(
+        this.elapsedTime,
+        this.stageDuration
+      ),
+      rank:
+        this.player
+          ? this.rankingSystem.getRank(
+              this.player
+            )
+          : null,
+      totalCompetitors:
+        this.rankingSystem.getTotal(),
+    };
+  }
+
+  handleStageCompletion() {
+    if (
+      this.state !== GameState.PLAYING ||
+      !this.player?.isAlive
+    ) {
+      return;
+    }
+
+    this.stageRemaining = 0;
+    this.input.setEnabled(false);
+    this.input.reset();
+    this.loop.stop();
+    this.setState(
+      GameState.STAGE_COMPLETE
+    );
+
+    this.emitAudio("achievement", 1.2);
+
+    this.onStageComplete?.(
+      this.buildRunResult({
+        reason: "STAGE_COMPLETE",
+        completed: true,
+      })
+    );
+  }
+
+  terminateActiveRun(
+    reason = "BACKGROUND_EXIT"
+  ) {
+    if (
+      this.lifecycleTerminated ||
+      ![
+        GameState.PLAYING,
+        GameState.PAUSED,
+      ].includes(this.state)
+    ) {
+      return false;
+    }
+
+    this.lifecycleTerminated = true;
+    this.input.setEnabled(false);
+    this.input.reset();
+    this.boostSystem.reset();
+    this.player?.setBoostIntensity(0);
+
+    this.loop.stop();
+    this.botSystem.clear();
+    this.foodSystem.clear();
+    this.particleSystem.reset();
+    this.collisionSystem.reset();
+    this.predationSystem.reset();
+    this.deathSystem.reset();
+
+    if (this.player) {
+      this.player.isAlive = false;
+    }
+
+    this.setState(
+      GameState.RUN_TERMINATED
+    );
+
+    this.onRunTerminated?.({
+      reason,
+      stage: this.stageNumber,
+      elapsedTime: this.elapsedTime,
+    });
+
+    return true;
   }
 
   forceRankingUpdate() {
@@ -846,6 +1035,16 @@ export class Game {
         this.rankingSystem.getTotal(),
       elapsedTime:
         this.elapsedTime,
+      stageNumber:
+        this.stageNumber,
+      stageDuration:
+        this.stageDuration,
+      stageRemaining:
+        this.stageRemaining,
+      stageDifficultyLabel:
+        getStageDifficultyLabel(
+          this.stageNumber
+        ),
     });
   }
 
@@ -861,12 +1060,23 @@ export class Game {
   }
 
   handleVisibilityChange() {
-    if (
-      document.hidden &&
-      this.state === GameState.PLAYING
-    ) {
-      this.pause();
+    if (document.hidden) {
+      this.terminateActiveRun(
+        "VISIBILITY_HIDDEN"
+      );
     }
+  }
+
+  handleLifecycleExit(event) {
+    this.terminateActiveRun(
+      event?.type === "pagehide"
+        ? "PAGE_HIDDEN"
+        : event?.type === "beforeunload"
+          ? "PAGE_UNLOADING"
+          : event?.type === "freeze"
+            ? "PAGE_FROZEN"
+            : "WINDOW_BLURRED"
+    );
   }
 
   handleKeyDown(event) {
@@ -897,6 +1107,26 @@ export class Game {
     document.removeEventListener(
       "visibilitychange",
       this.handleVisibilityChange
+    );
+
+    window.removeEventListener(
+      "pagehide",
+      this.handleLifecycleExit
+    );
+
+    window.removeEventListener(
+      "beforeunload",
+      this.handleLifecycleExit
+    );
+
+    window.removeEventListener(
+      "blur",
+      this.handleLifecycleExit
+    );
+
+    document.removeEventListener(
+      "freeze",
+      this.handleLifecycleExit
     );
 
     window.removeEventListener(

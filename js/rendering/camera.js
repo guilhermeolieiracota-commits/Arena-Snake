@@ -38,10 +38,27 @@ export class Camera {
       delta
     );
 
-    const sizeFactor = clamp(
-      (segmentCount - 30) / 160,
+    const lengthFactor = clamp(
+      (segmentCount - 30) / 180,
       0,
       1
+    );
+
+    const volumeFactor = clamp(
+      (target.radius -
+        BALANCE_CONFIG.snakeBaseRadius) /
+        Math.max(
+          BALANCE_CONFIG.snakeMaximumRadius -
+            BALANCE_CONFIG.snakeBaseRadius,
+          1
+        ),
+      0,
+      1
+    );
+
+    const sizeFactor = Math.max(
+      lengthFactor,
+      volumeFactor * 0.92
     );
 
     const sizeZoom =

@@ -1,19 +1,61 @@
 import { BALANCE_CONFIG, BOT_DIFFICULTY } from "../config/balance-config.js";
 import { randomBetween } from "../utils/random.js";
+import { getStageDifficulty } from "../stages/stage-config.js";
 import { scanEnvironment } from "./perception.js";
 import { combineWeighted, rotateVector, vectorToward } from "./steering.js";
 
 export class BotBrain {
   constructor({ profile, difficultyId = "normal" }) {
     this.profile = profile;
+    this.stageNumber = 1;
     this.setDifficulty(difficultyId);
+    this.setStage(1);
     this.reset();
   }
 
   setDifficulty(difficultyId) {
     this.difficultyId = BOT_DIFFICULTY[difficultyId] ? difficultyId : "normal";
-    this.difficulty = BOT_DIFFICULTY[this.difficultyId];
+    this.rebuildDifficulty();
     this.decisionTimer = 0;
+  }
+
+  setStage(stageNumber) {
+    this.stageNumber = Math.max(
+      1,
+      Math.round(Number(stageNumber) || 1)
+    );
+    this.rebuildDifficulty();
+    this.decisionTimer = 0;
+  }
+
+  rebuildDifficulty() {
+    const base =
+      BOT_DIFFICULTY[this.difficultyId] ??
+      BOT_DIFFICULTY.normal;
+
+    const stage = getStageDifficulty(
+      this.stageNumber
+    );
+
+    this.difficulty = {
+      ...base,
+      reactionMultiplier:
+        base.reactionMultiplier *
+        stage.reactionMultiplier,
+      aggressionMultiplier:
+        base.aggressionMultiplier *
+        stage.aggressionMultiplier,
+      boostMultiplier:
+        base.boostMultiplier *
+        stage.boostMultiplier,
+      perceptionMultiplier:
+        base.perceptionMultiplier *
+        stage.perceptionMultiplier,
+      stageSpeedMultiplier:
+        stage.speedMultiplier,
+      stageMassMultiplier:
+        stage.massMultiplier,
+    };
   }
 
   reset() {

@@ -14,6 +14,7 @@ import { SpawnSystem } from "./spawn-system.js";
 import {
   randomBetween,
 } from "../utils/random.js";
+import { getStageDifficulty } from "../stages/stage-config.js";
 
 const BOT_NAMES = Object.freeze([
   "Aurora",
@@ -114,10 +115,12 @@ export class BotSystem {
       ? difficultyId
       : "normal";
 
-    this.targetCount =
+    this.stageNumber = 1;
+    this.baseTargetCount =
       QUALITY_PRESETS[
         this.resolvedQualityName
       ].targetBotCount;
+    this.targetCount = this.baseTargetCount;
 
     this.records = [];
     this.spawnSystem = new SpawnSystem();
@@ -139,14 +142,84 @@ export class BotSystem {
     this.resolvedQualityName =
       this.resolveQualityName(qualityName);
 
-    this.targetCount =
+    this.baseTargetCount =
       QUALITY_PRESETS[
         this.resolvedQualityName
       ].targetBotCount;
+    this.recalculateTargetCount();
 
     if (player) {
       this.syncPopulation(player, particleSystem);
     }
+  }
+
+
+  recalculateTargetCount() {
+    const stage = getStageDifficulty(
+      this.stageNumber
+    );
+
+    const qualityLimit =
+      this.resolvedQualityName === "low"
+        ? 16
+        : this.resolvedQualityName === "medium"
+          ? 26
+          : 36;
+
+    this.targetCount = Math.min(
+      qualityLimit,
+      this.baseTargetCount + stage.extraBots
+    );
+  }
+
+  setStage(stageNumber, player = null, particleSystem = null) {
+    this.stageNumber = Math.max(
+      1,
+      Math.round(Number(stageNumber) || 1)
+    );
+
+    this.recalculateTargetCount();
+
+    for (const record of this.records) {
+      record.brain.setStage(
+        this.stageNumber
+      );
+      this.applyStageToBot(record.bot);
+    }
+
+    if (player) {
+      this.syncPopulation(
+        player,
+        particleSystem
+      );
+    }
+  }
+
+  getStageDifficulty() {
+    return getStageDifficulty(
+      this.stageNumber
+    );
+  }
+
+  getBotMassRange() {
+    const stage = this.getStageDifficulty();
+
+    return {
+      minimum:
+        BALANCE_CONFIG.bots.initialMassMin *
+        stage.massMultiplier,
+      maximum:
+        BALANCE_CONFIG.bots.initialMassMax *
+        stage.massMultiplier,
+    };
+  }
+
+  applyStageToBot(bot) {
+    const stage = this.getStageDifficulty();
+
+    bot.baseSpeed =
+      BALANCE_CONFIG.normalSpeed *
+      stage.speedMultiplier;
   }
 
   setDifficulty(difficultyId) {
@@ -216,9 +289,12 @@ export class BotSystem {
           )}`
         : baseName;
 
+    const massRange =
+      this.getBotMassRange();
+
     const mass = randomBetween(
-      BALANCE_CONFIG.bots.initialMassMin,
-      BALANCE_CONFIG.bots.initialMassMax
+      massRange.minimum,
+      massRange.maximum
     );
 
     const bot = new BotSnake({
@@ -233,12 +309,18 @@ export class BotSystem {
       ...skin,
     });
 
+    this.applyStageToBot(bot);
+
+    const brain = new BotBrain({
+      profile,
+      difficultyId: this.difficultyId,
+    });
+
+    brain.setStage(this.stageNumber);
+
     const record = {
       bot,
-      brain: new BotBrain({
-        profile,
-        difficultyId: this.difficultyId,
-      }),
+      brain,
       boostSystem: new BoostSystem(),
       respawnTimer: 0,
       active: true,
@@ -432,9 +514,12 @@ export class BotSystem {
           snakes: this.getBots(),
         });
 
+      const massRange =
+        this.getBotMassRange();
+
       const mass = randomBetween(
-        BALANCE_CONFIG.bots.initialMassMin,
-        BALANCE_CONFIG.bots.initialMassMax
+        massRange.minimum,
+        massRange.maximum
       );
 
       record.bot.reset({
@@ -444,6 +529,12 @@ export class BotSystem {
         mass,
       });
 
+      this.applyStageToBot(
+        record.bot
+      );
+      record.brain.setStage(
+        this.stageNumber
+      );
       record.brain.reset();
       record.boostSystem.reset();
       record.active = true;
@@ -452,6 +543,16 @@ export class BotSystem {
         record.bot
       );
     }
+  }
+
+  clear() {
+    for (const record of this.records) {
+      record.active = false;
+      record.bot.isAlive = false;
+      record.boostSystem.reset();
+    }
+
+    this.records.length = 0;
   }
 
   getBots() {
@@ -493,6 +594,7 @@ export class BotSystem {
           (record) => !record.active
         ).length,
       difficultyId: this.difficultyId,
+      stageNumber: this.stageNumber,
       profiles,
     };
   }

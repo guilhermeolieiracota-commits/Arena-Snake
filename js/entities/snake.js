@@ -42,6 +42,7 @@ export class Snake {
     this.targetRadius = this.baseRadius;
 
     this.segmentSpacing = BALANCE_CONFIG.segmentSpacing;
+    this.targetSegmentSpacing = BALANCE_CONFIG.segmentSpacing;
     this.pathSampleSpacing = BALANCE_CONFIG.pathSampleSpacing;
     this.segmentCount = segmentCount;
     this.targetSegmentCount = segmentCount;
@@ -271,6 +272,59 @@ export class Snake {
           BALANCE_CONFIG.snakeBaseRadius) *
           Math.sqrt(radiusProgress);
     }
+
+    const radiusRatio =
+      this.targetRadius /
+      BALANCE_CONFIG.snakeBaseRadius;
+
+    this.targetSegmentSpacing =
+      BALANCE_CONFIG.segmentSpacing *
+      (1 +
+        Math.max(0, radiusRatio - 1) *
+          0.48);
+  }
+
+  getBodyRadius(
+    index,
+    total = this.segmentCount
+  ) {
+    const safeTotal = Math.max(2, total);
+    const progress = clamp(
+      index / (safeTotal - 1),
+      0,
+      1
+    );
+
+    const tailTaper = Math.max(
+      0.34,
+      1 - Math.pow(progress, 1.72) * 0.72
+    );
+
+    const volumeProgress = clamp(
+      (this.radius - BALANCE_CONFIG.snakeBaseRadius) /
+        Math.max(
+          BALANCE_CONFIG.snakeMaximumRadius -
+            BALANCE_CONFIG.snakeBaseRadius,
+          1
+        ),
+      0,
+      1
+    );
+
+    const bodyBulge =
+      1 +
+      Math.sin(
+        Math.PI *
+          Math.min(1, progress * 1.15)
+      ) *
+        volumeProgress *
+        0.14;
+
+    return (
+      this.radius *
+      tailTaper *
+      bodyBulge
+    );
   }
 
   updateGrowth(delta) {
@@ -302,6 +356,14 @@ export class Snake {
       3.8,
       delta
     );
+
+    this.segmentSpacing =
+      exponentialSmoothing(
+        this.segmentSpacing,
+        this.targetSegmentSpacing,
+        3.2,
+        delta
+      );
 
     const sizeProgress = clamp(
       (this.mass - BALANCE_CONFIG.initialPlayerMass) /
@@ -431,6 +493,8 @@ export class Snake {
 
     this.radius = BALANCE_CONFIG.snakeBaseRadius;
     this.targetRadius = BALANCE_CONFIG.snakeBaseRadius;
+    this.segmentSpacing = BALANCE_CONFIG.segmentSpacing;
+    this.targetSegmentSpacing = BALANCE_CONFIG.segmentSpacing;
     this.speed = this.baseSpeed;
     this.isAlive = true;
 

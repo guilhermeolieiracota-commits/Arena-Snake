@@ -3892,3 +3892,114 @@ body,
   object-fit: contain;
   filter: drop-shadow(0 1px 0 rgba(0,0,0,0.08));
 }
+
+/* Fase 16 — progressão de fases, cronômetro e encerramento */
+.stage-home-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stage-home-summary > span,
+.run-terminated-stage {
+  display: grid;
+  gap: 5px;
+  padding: 14px 16px;
+  border: 1px solid rgba(77, 218, 255, 0.24);
+  border-radius: 18px;
+  background: rgba(10, 26, 45, 0.82);
+}
+
+.stage-home-summary small,
+.run-terminated-stage span {
+  color: rgba(194, 214, 240, 0.78);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+}
+
+.stage-home-summary strong,
+.run-terminated-stage strong {
+  color: #76f5df;
+  font-size: 1rem;
+}
+
+.hud-card--stage,
+.hud-card--timer {
+  border-color: rgba(76, 232, 211, 0.42);
+}
+
+.hud-card--timer strong {
+  min-width: 4ch;
+  font-variant-numeric: tabular-nums;
+  color: #76f5df;
+}
+
+.hud-card--timer.hud-card--timer-warning strong {
+  color: #ffd966;
+}
+
+.hud-card--timer.hud-card--timer-critical {
+  border-color: rgba(255, 101, 122, 0.75);
+  animation: stageTimerPulse 0.75s ease-in-out infinite alternate;
+}
+
+.hud-card--timer.hud-card--timer-critical strong {
+  color: #ff8f9f;
+}
+
+@keyframes stageTimerPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.035); }
+}
+
+.stage-complete-panel {
+  width: min(100%, 640px);
+}
+
+.stage-complete-panel h2 {
+  color: #75f4d9;
+}
+
+.stage-complete-hero {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 22px 0;
+}
+
+.stage-complete-hero > span {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(76, 232, 211, 0.3);
+  background: linear-gradient(180deg, rgba(11, 37, 55, 0.9), rgba(6, 19, 34, 0.96));
+}
+
+.stage-complete-hero small {
+  color: rgba(200, 216, 239, 0.75);
+}
+
+.stage-complete-hero strong {
+  color: #78f6df;
+  font-size: 1.12rem;
+}
+
+.run-terminated-panel {
+  border-color: rgba(255, 143, 101, 0.4);
+}
+
+.run-terminated-panel .run-terminated-stage {
+  margin: 20px 0;
+}
+
+.online-auth-panel[aria-busy="true"] {
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.online-auth-panel .field small {
+  color: rgba(180, 199, 226, 0.65);
+  font-size: 0.74rem;
+}

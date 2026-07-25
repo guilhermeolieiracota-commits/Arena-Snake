@@ -24,12 +24,12 @@ const [
 
 assert.match(
   boot,
-  /BOOT_FIX_VERSION = "15-(1|2)"/
+  /BOOT_FIX_VERSION = "(16-0|15-(1|2))"/
 );
 
 assert.match(
   serviceWorker,
-  /CACHE_NAME = "snake-arena-v15-(1|2)"/
+  /CACHE_NAME = "snake-arena-v(16-0|15-(1|2))"/
 );
 
 assert.match(
@@ -79,7 +79,7 @@ assert.match(
 
 assert.match(
   gameConfig,
-  /version: "0\.15\.(1|2)"/
+  /version: "0\.(16\.0|15\.(1|2))"/
 );
 
 console.log(

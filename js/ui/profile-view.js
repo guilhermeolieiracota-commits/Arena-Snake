@@ -49,6 +49,24 @@ export function renderProfile({
   elements.profileStreakValue.textContent =
     String(playerMeta.currentStreak);
 
+  elements.profileHighestStageValue.textContent =
+    `Fase ${Math.max(
+      1,
+      Math.round(
+        Number(playerMeta.highestStage) || 1
+      )
+    )}`;
+
+  elements.profileStagesCompletedValue.textContent =
+    String(
+      Math.max(
+        0,
+        Math.round(
+          Number(playerMeta.stagesCompleted) || 0
+        )
+      )
+    );
+
   elements.profileSkinPreview.style.setProperty(
     "--profile-primary",
     skin.primaryColor

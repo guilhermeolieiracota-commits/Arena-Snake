@@ -56,6 +56,14 @@ export class MatchHistorySystem {
         settings.skinId,
       difficulty:
         settings.difficulty,
+      stage: Math.max(
+        1,
+        Math.round(
+          Number(result.stage) || 1
+        )
+      ),
+      completed:
+        Boolean(result.completed),
 
       score:
         Math.max(

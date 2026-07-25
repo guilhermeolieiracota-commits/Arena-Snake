@@ -67,6 +67,10 @@ export const DEFAULT_PLAYER_META = Object.freeze({
   longestStreak: 0,
   totalActiveDays: 0,
   activityDates: Object.freeze([]),
+  currentStage: 1,
+  highestStage: 1,
+  stagesCompleted: 0,
+  lastStageCompletedAt: null,
 });
 
 export const DEFAULT_COMPETITIVE = Object.freeze({
@@ -163,6 +167,10 @@ export function createDefaultSave(
       longestStreak: 0,
       totalActiveDays: 0,
       activityDates: [],
+      currentStage: 1,
+      highestStage: 1,
+      stagesCompleted: 0,
+      lastStageCompletedAt: null,
     },
     competitive: {
       rating: 1000,

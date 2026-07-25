@@ -96,6 +96,20 @@ export class FoodSystem {
     this.syncPopulation();
   }
 
+  clear() {
+    for (const food of this.activeFoods) {
+      this.grid.remove(food);
+      this.pool.release(food);
+    }
+
+    this.activeFoods.length = 0;
+    this.naturalCount = 0;
+    this.boostDropCount = 0;
+    this.remainsCount = 0;
+    this.grid.clear();
+    this.hotspots.length = 0;
+  }
+
   createHotspots() {
     this.hotspots.length = 0;
 

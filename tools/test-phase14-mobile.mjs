@@ -141,7 +141,7 @@ const serviceWorker = await readFile(
 
 assert.match(
   serviceWorker,
-  /snake-arena-v(15-2|15-1|15-0|14-2)/
+  /snake-arena-v(16-0|15-2|15-1|15-0|14-2)/
 );
 
 console.log(

@@ -11,6 +11,8 @@ import { WeeklyEventSystem } from "./events/weekly-event-system.js";
 import { CompetitiveSystem } from "./competitive/competitive-system.js";
 import { MatchHistorySystem } from "./history/match-history-system.js";
 import { StreakSystem } from "./activity/streak-system.js";
+import { StageSystem } from "./stages/stage-system.js";
+import { RunGuard } from "./stages/run-guard.js";
 import { SaveTransferService } from "./backup/save-transfer-service.js";
 import { getLeagueByRating } from "./competitive/league-config.js";
 import {
@@ -78,6 +80,8 @@ const elements = {
   dataScreen: document.querySelector("#dataScreen"),
   onlineScreen: document.querySelector("#onlineScreen"),
   gameOverScreen: document.querySelector("#gameOverScreen"),
+  stageCompleteScreen: document.querySelector("#stageCompleteScreen"),
+  runTerminatedScreen: document.querySelector("#runTerminatedScreen"),
 
   startButton: document.querySelector("#startButton"),
   resumeButton: document.querySelector("#resumeButton"),
@@ -103,6 +107,9 @@ const elements = {
   gameOverHistoryButton: document.querySelector("#gameOverHistoryButton"),
   gameOverMenuButton:
     document.querySelector("#gameOverMenuButton"),
+  nextStageButton: document.querySelector("#nextStageButton"),
+  stageCompleteMenuButton: document.querySelector("#stageCompleteMenuButton"),
+  terminatedHomeButton: document.querySelector("#terminatedHomeButton"),
   pauseButton: document.querySelector("#pauseButton"),
 
   openCompetitiveButton: document.querySelector("#openCompetitiveButton"),
@@ -160,6 +167,8 @@ const elements = {
   onlineSummaryLabel: document.querySelector("#onlineSummaryLabel"),
   onlineSummaryValue: document.querySelector("#onlineSummaryValue"),
   onlineSummaryState: document.querySelector("#onlineSummaryState"),
+  currentStageMenuValue: document.querySelector("#currentStageMenuValue"),
+  highestStageMenuValue: document.querySelector("#highestStageMenuValue"),
 
   settingsNicknameInput:
     document.querySelector("#settingsNicknameInput"),
@@ -267,6 +276,7 @@ const elements = {
   onlineLeaderboardPanel: document.querySelector("#onlineLeaderboardPanel"),
   onlineEmailInput: document.querySelector("#onlineEmailInput"),
   onlinePasswordInput: document.querySelector("#onlinePasswordInput"),
+  onlineSignupConfirmPasswordInput: document.querySelector("#onlineSignupConfirmPasswordInput"),
   onlineSignInButton: document.querySelector("#onlineSignInButton"),
   onlineSignUpButton: document.querySelector("#onlineSignUpButton"),
   onlineForgotPasswordButton: document.querySelector("#onlineForgotPasswordButton"),
@@ -365,6 +375,8 @@ const elements = {
   profileGamesValue: document.querySelector("#profileGamesValue"),
   profileBestScoreValue: document.querySelector("#profileBestScoreValue"),
   profileEliminationsValue: document.querySelector("#profileEliminationsValue"),
+  profileHighestStageValue: document.querySelector("#profileHighestStageValue"),
+  profileStagesCompletedValue: document.querySelector("#profileStagesCompletedValue"),
   profilePlayerIdValue: document.querySelector("#profilePlayerIdValue"),
   profileStreakValue: document.querySelector("#profileStreakValue"),
   profileHistoryList: document.querySelector("#profileHistoryList"),
@@ -393,6 +405,9 @@ const elements = {
   weeklyBackButton: document.querySelector("#weeklyBackButton"),
 
   gameHud: document.querySelector("#gameHud"),
+  stageHudValue: document.querySelector("#stageHudValue"),
+  stageTimerValue: document.querySelector("#stageTimerValue"),
+  stageDifficultyHudValue: document.querySelector("#stageDifficultyHudValue"),
   centerHint: document.querySelector("#centerHint"),
   joystick: document.querySelector("#joystick"),
   joystickKnob: document.querySelector("#joystickKnob"),
@@ -449,6 +464,17 @@ const elements = {
   achievementToast: document.querySelector("#achievementToast"),
   achievementToastIcon: document.querySelector("#achievementToastIcon"),
   achievementToastName: document.querySelector("#achievementToastName"),
+
+  completedStageValue: document.querySelector("#completedStageValue"),
+  nextStageValue: document.querySelector("#nextStageValue"),
+  nextStageDifficultyValue: document.querySelector("#nextStageDifficultyValue"),
+  stageFinalScoreValue: document.querySelector("#stageFinalScoreValue"),
+  stageFinalMassValue: document.querySelector("#stageFinalMassValue"),
+  stageFinalEliminationsValue: document.querySelector("#stageFinalEliminationsValue"),
+  stageFinalRankValue: document.querySelector("#stageFinalRankValue"),
+  stageCoinsEarnedValue: document.querySelector("#stageCoinsEarnedValue"),
+  stageXpEarnedValue: document.querySelector("#stageXpEarnedValue"),
+  terminatedStageValue: document.querySelector("#terminatedStageValue"),
 
   gameOverReason:
     document.querySelector("#gameOverReason"),
@@ -510,6 +536,8 @@ const elements = {
   historyDebugValue: document.querySelector("#historyDebugValue"),
   streakDebugValue: document.querySelector("#streakDebugValue"),
   cloudDebugValue: document.querySelector("#cloudDebugValue"),
+  stageDebugValue: document.querySelector("#stageDebugValue"),
+  stageTimerDebugValue: document.querySelector("#stageTimerDebugValue"),
 };
 
 for (
@@ -524,7 +552,7 @@ for (
 }
 
 document.title =
-  `${GAME_CONFIG.name} — Fase 15.2`;
+  `${GAME_CONFIG.name} — Fase 16`;
 
 const storageService =
   new StorageService();
@@ -562,6 +590,8 @@ let weeklyEventSystem;
 let competitiveSystem;
 let matchHistorySystem;
 let streakSystem;
+let stageSystem;
+let runGuard;
 let saveTransferService;
 let cloudClient;
 let cloudSessionService;
@@ -587,6 +617,7 @@ let sessionRewardStart = {
 let selectedSkinDraftId =
   currentSettings.skinId;
 let lastCompletedMatch = null;
+let pendingNextStage = null;
 let onlineLeaderboard = [];
 let onlineCommunityProfiles = [];
 let onlineGlobalFeed = [];
@@ -623,6 +654,8 @@ const baseScreens = [
   elements.menuScreen,
   elements.pauseScreen,
   elements.gameOverScreen,
+  elements.stageCompleteScreen,
+  elements.runTerminatedScreen,
 ];
 
 const numberFormatter =
@@ -706,6 +739,20 @@ const showBaseScreenForState = (
   ) {
     setScreenVisibility(
       elements.gameOverScreen,
+      true
+    );
+  } else if (
+    state === GameState.STAGE_COMPLETE
+  ) {
+    setScreenVisibility(
+      elements.stageCompleteScreen,
+      true
+    );
+  } else if (
+    state === GameState.RUN_TERMINATED
+  ) {
+    setScreenVisibility(
+      elements.runTerminatedScreen,
       true
     );
   }
@@ -1092,6 +1139,109 @@ const renderGameOver = (result) => {
 
   elements.finalMedalValue.textContent =
     `${result.medalIcon ?? "🎮"} ${result.medalName ?? "Competidor"}`;
+};
+
+const renderStageProgress = () => {
+  const snapshot =
+    stageSystem?.getSnapshot?.();
+
+  if (!snapshot) {
+    return;
+  }
+
+  elements.currentStageMenuValue.textContent =
+    `Fase ${snapshot.currentStage}`;
+
+  elements.highestStageMenuValue.textContent =
+    `Fase ${snapshot.highestStage}`;
+
+  elements.profileHighestStageValue.textContent =
+    `Fase ${snapshot.highestStage}`;
+
+  elements.profileStagesCompletedValue.textContent =
+    String(snapshot.stagesCompleted);
+};
+
+const updateStageHud = ({
+  stageNumber,
+  stageRemaining,
+  stageDifficultyLabel,
+}) => {
+  const safeRemaining = Math.max(
+    0,
+    Number(stageRemaining) || 0
+  );
+
+  elements.stageHudValue.textContent =
+    String(stageNumber || 1);
+
+  elements.stageTimerValue.textContent =
+    formatTime(Math.ceil(safeRemaining));
+
+  elements.stageDifficultyHudValue.textContent =
+    stageDifficultyLabel || "Iniciante";
+
+  elements.stageDebugValue.textContent =
+    String(stageNumber || 1);
+
+  elements.stageTimerDebugValue.textContent =
+    formatTime(Math.ceil(safeRemaining));
+
+  const timerCard =
+    elements.stageTimerValue.closest(
+      ".hud-card"
+    );
+
+  timerCard?.classList.toggle(
+    "hud-card--timer-warning",
+    safeRemaining <= 30 &&
+      safeRemaining > 10
+  );
+
+  timerCard?.classList.toggle(
+    "hud-card--timer-critical",
+    safeRemaining <= 10
+  );
+};
+
+const renderStageComplete = ({
+  result,
+  rewards,
+  progression,
+}) => {
+  elements.completedStageValue.textContent =
+    `Fase ${progression.completedStage}`;
+
+  elements.nextStageValue.textContent =
+    `Fase ${progression.nextStage}`;
+
+  elements.nextStageDifficultyValue.textContent =
+    progression.difficultyLabel;
+
+  elements.stageFinalScoreValue.textContent =
+    formatNumber(result.score);
+
+  elements.stageFinalMassValue.textContent =
+    formatNumber(result.maximumMass);
+
+  elements.stageFinalEliminationsValue.textContent =
+    String(result.eliminations);
+
+  elements.stageFinalRankValue.textContent =
+    result.rank
+      ? `#${result.rank}/${result.totalCompetitors}`
+      : "—";
+
+  elements.stageCoinsEarnedValue.textContent =
+    formatNumber(rewards.coins);
+
+  elements.stageXpEarnedValue.textContent =
+    formatNumber(rewards.xp);
+};
+
+const showRunTerminated = ({ stage }) => {
+  elements.terminatedStageValue.textContent =
+    `Fase ${Math.max(1, Number(stage) || 1)}`;
 };
 
 const updateAudioButton = () => {
@@ -2614,24 +2764,12 @@ const readOnlineEmail = () => {
   return email;
 };
 
-const readOnlineCredentials = () => {
-  const email =
-    elements.onlineEmailInput.value
-      .trim()
-      .toLowerCase();
-
+const readOnlineCredentials = ({
+  forSignup = false,
+} = {}) => {
+  const email = readOnlineEmail();
   const password =
     elements.onlinePasswordInput.value;
-
-  if (
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-      email
-    )
-  ) {
-    throw new Error(
-      "Digite um e-mail válido."
-    );
-  }
 
   if (password.length < 6) {
     throw new Error(
@@ -2639,10 +2777,48 @@ const readOnlineCredentials = () => {
     );
   }
 
+  if (forSignup) {
+    const confirmation =
+      elements.onlineSignupConfirmPasswordInput
+        .value;
+
+    if (!confirmation) {
+      throw new Error(
+        "Confirme a senha para criar a conta."
+      );
+    }
+
+    if (password !== confirmation) {
+      throw new Error(
+        "As senhas não coincidem."
+      );
+    }
+  }
+
   return {
     email,
     password,
   };
+};
+
+const setOnlineAuthBusy = (
+  busy
+) => {
+  const controls = [
+    elements.onlineSignInButton,
+    elements.onlineSignUpButton,
+    elements.onlineForgotPasswordButton,
+    elements.onlineResendConfirmationButton,
+  ].filter(Boolean);
+
+  for (const control of controls) {
+    control.disabled = Boolean(busy);
+  }
+
+  elements.onlineAuthPanel?.setAttribute(
+    "aria-busy",
+    String(Boolean(busy))
+  );
 };
 
 const runOnlineAction = async (
@@ -2652,6 +2828,8 @@ const runOnlineAction = async (
     "";
   elements.onlineRecoveryMessage.textContent =
     "";
+
+  setOnlineAuthBusy(true);
 
   try {
     return await action();
@@ -2675,6 +2853,8 @@ const runOnlineAction = async (
 
     renderOnlineState();
     return null;
+  } finally {
+    setOnlineAuthBusy(false);
   }
 };
 
@@ -2989,6 +3169,166 @@ const updateFullscreenButtons = () => {
       : "⛶";
 };
 
+stageSystem = new StageSystem({
+  storageService,
+});
+
+runGuard = new RunGuard();
+
+const refreshAllProgressViews = () => {
+  updateCoinBalance();
+  updateProgressionUi();
+  updateCompetitiveUi();
+  updateStreakUi();
+  renderStageProgress();
+  renderStats();
+  renderAchievements();
+  renderDaily();
+  renderShop();
+  renderProfileScreen();
+  renderSeasonScreen();
+  renderWeeklyScreen();
+  renderCompetitiveScreen();
+  renderHistoryScreen();
+  renderDataScreen();
+  renderOnlineState();
+};
+
+const syncCompletedRunToCloud = () => {
+  void cloudSyncSystem
+    ?.syncAfterMatch()
+    .then(async (syncResult) => {
+      if (syncResult) {
+        await cloudCommunitySystem
+          ?.syncCommunityData();
+      }
+
+      await refreshGlobalLeaderboard({
+        silent: true,
+      });
+    })
+    .catch(() => {
+      // O progresso principal permanece salvo localmente.
+    });
+};
+
+const finalizeRunResult = (
+  result,
+  {
+    stageCompletion = false,
+  } = {}
+) => {
+  const matchId =
+    matchHistorySystem.createMatchId();
+
+  currentStats =
+    storageService.saveCompletedGame(
+      result
+    );
+
+  liveSessionSnapshot = {
+    ...liveSessionSnapshot,
+    ...result,
+    mass: result.maximumMass,
+    rank: result.rank,
+    matchesCompleted: 1,
+  };
+
+  economySystem.rewardMatch(result);
+  progressionSystem.rewardMatch(result);
+
+  if (stageCompletion) {
+    const stage = Math.max(
+      1,
+      Number(result.stage) || 1
+    );
+
+    economySystem.addCoins(
+      35 + stage * 7,
+      `stage-clear-coins:${stage}`,
+      { unique: true }
+    );
+
+    progressionSystem.addXp(
+      45 + stage * 9,
+      `stage-clear-xp:${stage}`,
+      { unique: true }
+    );
+  }
+
+  seasonSystem.rewardMatch(result);
+  weeklyEventSystem.recordMatch(result);
+
+  dailyChallengeSystem.evaluate(
+    getDailyContext(
+      liveSessionSnapshot
+    )
+  );
+
+  achievementSystem.evaluate(
+    getAchievementContext(
+      liveSessionSnapshot
+    )
+  );
+
+  const competitiveResult =
+    competitiveSystem.recordMatch(
+      result,
+      matchId
+    );
+
+  const coinsEarned = Math.max(
+    0,
+    economySystem.getBalance() -
+      sessionRewardStart.coins
+  );
+
+  const xpEarned = Math.max(
+    0,
+    progressionSystem.getTotalXp() -
+      sessionRewardStart.xp
+  );
+
+  const seasonPointsEarned = Math.max(
+    0,
+    seasonSystem.getPoints() -
+      sessionRewardStart.seasonPoints
+  );
+
+  const historyResult =
+    matchHistorySystem.record({
+      matchId,
+      result,
+      rewards: {
+        coins: coinsEarned,
+        xp: xpEarned,
+        seasonPoints:
+          seasonPointsEarned,
+      },
+      competitive:
+        competitiveResult,
+      profile:
+        progressionSystem.getSnapshot(),
+      settings:
+        currentSettings,
+    });
+
+  lastCompletedMatch =
+    historyResult.record;
+
+  refreshAllProgressViews();
+  syncCompletedRunToCloud();
+
+  return {
+    coinsEarned,
+    xpEarned,
+    seasonPointsEarned,
+    competitiveResult,
+    historyResult,
+    lastCompletedMatch,
+  };
+};
+
 game = new Game({
   canvas: elements.canvas,
   joystickRoot: elements.joystick,
@@ -3024,142 +3364,82 @@ game = new Game({
   },
 
   onGameOver: (result) => {
-    const matchId =
-      matchHistorySystem.createMatchId();
+    runGuard.clear();
+    stageSystem.failCurrentStage();
+    audioManager.stopMusic();
 
-    currentStats =
-      storageService.saveCompletedGame(
-        result
-      );
-
-    liveSessionSnapshot = {
-      ...liveSessionSnapshot,
-      ...result,
-      mass: result.maximumMass,
-      rank: result.rank,
-      matchesCompleted: 1,
-    };
-
-    economySystem.rewardMatch(
-      result
-    );
-
-    progressionSystem.rewardMatch(
-      result
-    );
-
-    seasonSystem.rewardMatch(
-      result
-    );
-
-    weeklyEventSystem.recordMatch(
-      result
-    );
-
-    dailyChallengeSystem.evaluate(
-      getDailyContext(
-        liveSessionSnapshot
-      )
-    );
-
-    achievementSystem.evaluate(
-      getAchievementContext(
-        liveSessionSnapshot
-      )
-    );
-
-    const competitiveResult =
-      competitiveSystem.recordMatch(
-        result,
-        matchId
-      );
-
-    const coinsEarned =
-      Math.max(
-        0,
-        economySystem.getBalance() -
-          sessionRewardStart.coins
-      );
-
-    const xpEarned =
-      Math.max(
-        0,
-        progressionSystem.getTotalXp() -
-          sessionRewardStart.xp
-      );
-
-    const seasonPointsEarned =
-      Math.max(
-        0,
-        seasonSystem.getPoints() -
-          sessionRewardStart.seasonPoints
-      );
-
-    const historyResult =
-      matchHistorySystem.record({
-        matchId,
-        result,
-        rewards: {
-          coins: coinsEarned,
-          xp: xpEarned,
-          seasonPoints:
-            seasonPointsEarned,
-        },
-        competitive:
-          competitiveResult,
-        profile:
-          progressionSystem.getSnapshot(),
-        settings:
-          currentSettings,
-      });
-
-    lastCompletedMatch =
-      historyResult.record;
+    const rewards =
+      finalizeRunResult(result);
 
     renderGameOver({
       ...result,
-      coinsEarned,
-      xpEarned,
-      seasonPointsEarned,
+      coinsEarned:
+        rewards.coinsEarned,
+      xpEarned:
+        rewards.xpEarned,
+      seasonPointsEarned:
+        rewards.seasonPointsEarned,
       ratingDelta:
-        lastCompletedMatch.ratingDelta,
+        rewards.lastCompletedMatch
+          .ratingDelta,
       medalIcon:
-        lastCompletedMatch.medalIcon,
+        rewards.lastCompletedMatch
+          .medalIcon,
       medalName:
-        lastCompletedMatch.medalName,
+        rewards.lastCompletedMatch
+          .medalName,
     });
+  },
 
-    updateCoinBalance();
-    updateProgressionUi();
-    updateCompetitiveUi();
-    updateStreakUi();
-    renderStats();
-    renderAchievements();
-    renderDaily();
-    renderShop();
-    renderProfileScreen();
-    renderSeasonScreen();
-    renderWeeklyScreen();
-    renderCompetitiveScreen();
-    renderHistoryScreen();
-    renderDataScreen();
-    renderOnlineState();
+  onStageComplete: (result) => {
+    runGuard.clear();
+    audioManager.stopMusic();
 
-    void cloudSyncSystem
-      ?.syncAfterMatch()
-      .then(async (result) => {
-        if (result) {
-          await cloudCommunitySystem
-            ?.syncCommunityData();
-        }
+    const progression =
+      stageSystem.completeCurrentStage();
 
-        await refreshGlobalLeaderboard({
-          silent: true,
-        });
-      })
-      .catch(() => {
-        // O progresso principal já permanece salvo localmente.
+    const rewards =
+      finalizeRunResult(result, {
+        stageCompletion: true,
       });
+
+    pendingNextStage =
+      progression.nextStage;
+
+    renderStageComplete({
+      result,
+      progression,
+      rewards: {
+        coins:
+          rewards.coinsEarned,
+        xp:
+          rewards.xpEarned,
+      },
+    });
+  },
+
+  onRunTerminated: (result) => {
+    runGuard.clear();
+    pendingNextStage = null;
+    cloudClient?.abortPendingRequests?.();
+    void audioManager.stopAll();
+
+    window.clearTimeout(
+      toastQueueTimer
+    );
+    window.clearTimeout(
+      rewardToastTimer
+    );
+    window.clearTimeout(
+      achievementToastTimer
+    );
+
+    toastQueue.length = 0;
+    toastQueueActive = false;
+    elements.rewardToast.hidden = true;
+    elements.achievementToast.hidden = true;
+
+    showRunTerminated(result);
   },
 
   onPlayerUpdate: ({
@@ -3189,6 +3469,9 @@ game = new Game({
     totalDeaths,
     playerRank,
     rankingTotal,
+    stageNumber,
+    stageRemaining,
+    stageDifficultyLabel,
   }) => {
     elements.positionValue.textContent =
       `${Math.round(x)}, ${Math.round(y)}`;
@@ -3255,6 +3538,12 @@ game = new Game({
       intensity: boostIntensity,
     });
 
+    updateStageHud({
+      stageNumber,
+      stageRemaining,
+      stageDifficultyLabel,
+    });
+
     liveSessionSnapshot = {
       mass,
       maximumMass,
@@ -3262,6 +3551,8 @@ game = new Game({
       collected,
       eliminations,
       elapsedTime,
+      stage: stageNumber,
+      stageRemaining,
     };
 
     if (
@@ -3488,6 +3779,49 @@ game.setNickname(
 
 game.initialize();
 
+const beginCurrentStage = ({
+  restart = false,
+  stage = stageSystem.getSnapshot()
+    .currentStage,
+} = {}) => {
+  const safeStage = Math.max(
+    1,
+    Math.round(Number(stage) || 1)
+  );
+
+  pendingNextStage = null;
+  resetLiveSession();
+  runGuard.markActive({
+    stage: safeStage,
+  });
+
+  void audioManager.ensureStarted();
+  audioManager.startMusic();
+
+  if (restart) {
+    game.restart();
+  } else {
+    game.start(
+      currentSettings.nickname,
+      { stage: safeStage }
+    );
+  }
+};
+
+const interruptedRun =
+  runGuard.consumeInterruptedRun();
+
+if (interruptedRun) {
+  game.setState(
+    GameState.RUN_TERMINATED
+  );
+  showRunTerminated(
+    interruptedRun
+  );
+} else {
+  renderStageProgress();
+}
+
 elements.startButton.addEventListener(
   "click",
   () => {
@@ -3520,16 +3854,10 @@ elements.startButton.addEventListener(
 
     applySettings(nextSettings);
     streakSystem.registerToday();
-    resetLiveSession();
     dailyChallengeSystem.ensureToday();
     renderDaily();
 
-    void audioManager.ensureStarted();
-    audioManager.startMusic();
-
-    game.start(
-      currentSettings.nickname
-    );
+    beginCurrentStage();
   }
 );
 
@@ -3548,31 +3876,71 @@ elements.pauseSettingsButton.addEventListener(
 elements.restartButton.addEventListener(
   "click",
   () => {
-    resetLiveSession();
-    game.restart();
+    beginCurrentStage({
+      restart: true,
+      stage: stageSystem.getSnapshot()
+        .currentStage,
+    });
   }
 );
 
 elements.gameOverRestartButton.addEventListener(
   "click",
   () => {
-    resetLiveSession();
-    game.restart();
+    beginCurrentStage({
+      restart: true,
+      stage: stageSystem.getSnapshot()
+        .currentStage,
+    });
   }
 );
 
-elements.menuButton.addEventListener(
+elements.nextStageButton.addEventListener(
   "click",
   () => {
-    game.returnToMenu();
+    const nextStage =
+      pendingNextStage ??
+      stageSystem.getSnapshot()
+        .currentStage;
+
+    resetLiveSession();
+    runGuard.markActive({
+      stage: nextStage,
+    });
+
+    void audioManager.ensureStarted();
+    audioManager.startMusic();
+    game.startNextStage(nextStage);
+    pendingNextStage = null;
   }
+);
+
+const returnToHomeFromRun = () => {
+  runGuard.clear();
+  pendingNextStage = null;
+  void audioManager.stopAll();
+  game.returnToMenu();
+  renderStageProgress();
+};
+
+elements.menuButton.addEventListener(
+  "click",
+  returnToHomeFromRun
 );
 
 elements.gameOverMenuButton.addEventListener(
   "click",
-  () => {
-    game.returnToMenu();
-  }
+  returnToHomeFromRun
+);
+
+elements.stageCompleteMenuButton.addEventListener(
+  "click",
+  returnToHomeFromRun
+);
+
+elements.terminatedHomeButton.addEventListener(
+  "click",
+  returnToHomeFromRun
 );
 
 elements.gameOverStatsButton.addEventListener(
@@ -3897,7 +4265,9 @@ elements.onlineSignUpButton.addEventListener(
     void runOnlineAction(
       async () => {
         const credentials =
-          readOnlineCredentials();
+          readOnlineCredentials({
+            forSignup: true,
+          });
 
         setOnlineMessage(
           "Criando conta...",
@@ -3910,9 +4280,13 @@ elements.onlineSignUpButton.addEventListener(
               ...credentials,
               nickname:
                 currentSettings.nickname,
+              redirectTo:
+                getAuthRedirectUrl(),
             });
 
         elements.onlinePasswordInput.value =
+          "";
+        elements.onlineSignupConfirmPasswordInput.value =
           "";
 
         if (
@@ -4710,9 +5084,29 @@ document.addEventListener(
   }
 );
 
+const stopBackgroundActivity = () => {
+  cloudClient?.abortPendingRequests?.();
+  void audioManager.stopAll();
+};
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+    if (document.hidden) {
+      stopBackgroundActivity();
+    }
+  }
+);
+
+window.addEventListener(
+  "pagehide",
+  stopBackgroundActivity
+);
+
 window.addEventListener(
   "beforeunload",
   () => {
+    stopBackgroundActivity();
     storageService.saveSettings(
       currentSettings
     );

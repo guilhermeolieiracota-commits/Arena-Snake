@@ -160,16 +160,11 @@ export class SnakeRenderer {
     ) {
       const segment = segments[index];
 
-      const taper = Math.max(
-        0.48,
-        1 -
-          index /
-            (segments.length * 1.32)
-      );
-
       const radius =
-        snake.radius *
-        taper *
+        snake.getBodyRadius(
+          index,
+          segments.length
+        ) *
         (1 +
           snake.boostIntensity *
             0.035);

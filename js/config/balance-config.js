@@ -37,11 +37,11 @@ export const BALANCE_CONFIG = Object.freeze({
   pathSampleSpacing: 4,
 
   snakeBaseRadius: 18,
-  snakeMaximumRadius: 24,
-  massForMaximumRadius: 1400,
+  snakeMaximumRadius: 40,
+  massForMaximumRadius: 2600,
 
   normalSpeed: 185,
-  minimumLargeSnakeSpeedFactor: 0.82,
+  minimumLargeSnakeSpeedFactor: 0.76,
   maxTurnRate: 3.25,
 
   boundaryWarningDistance: 500,

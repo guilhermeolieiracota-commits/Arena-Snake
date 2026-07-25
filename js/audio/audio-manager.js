@@ -200,6 +200,21 @@ export class AudioManager {
     }
   }
 
+  async stopAll() {
+    this.stopMusic();
+
+    if (
+      this.context &&
+      this.context.state === "running"
+    ) {
+      try {
+        await this.context.suspend();
+      } catch {
+        // O navegador pode recusar a suspensão durante o fechamento.
+      }
+    }
+  }
+
   scheduleMusicStep() {
     if (
       !this.context ||

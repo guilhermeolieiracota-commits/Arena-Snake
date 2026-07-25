@@ -3,5 +3,7 @@ export const GameState = Object.freeze({
   MENU: "MENU",
   PLAYING: "PLAYING",
   PAUSED: "PAUSED",
+  STAGE_COMPLETE: "STAGE_COMPLETE",
+  RUN_TERMINATED: "RUN_TERMINATED",
   GAME_OVER: "GAME_OVER",
 });
